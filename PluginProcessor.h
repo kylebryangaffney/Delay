@@ -1,6 +1,8 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "Parameters.h"
+
 
 //==============================================================================
 /**
@@ -47,5 +49,12 @@ public:
 
 private:
     //==============================================================================
+    juce::AudioProcessorValueTreeState apvts
+    {
+        *this, nullptr, "Parameters", Parameters::createParameterLayout()
+    };
+
+    Parameters params;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DelayAudioProcessor)
 };
