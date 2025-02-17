@@ -82,8 +82,8 @@ void DelayAudioProcessor::changeProgramName (int index, const juce::String& newN
 //==============================================================================
 void DelayAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    params.prepareToPlay(sampleRate);
+    params.reset();
 }
 
 void DelayAudioProcessor::releaseResources()
@@ -109,16 +109,17 @@ void DelayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, [[mayb
         buffer.clear (i, 0, buffer.getNumSamples());
 
     params.update();
-    float gain = params.gain;
 
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    float* channelDataL = buffer.getWritePointer(0);
+    float* channelDataR = buffer.getWritePointer(1);
+
+  
+    for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
     {
-        auto* channelData = buffer.getWritePointer(channel);
+        params.smoothen();
 
-        for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
-        {
-            channelData[sample] *= gain;
-        }
+        channelDataL[sample] *= params.gain;
+        channelDataR[sample] *= params.gain;
     }
 
 }
