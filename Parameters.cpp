@@ -78,6 +78,8 @@ void Parameters::prepareToPlay(double sampleRate) noexcept
 {
     double duration = 0.02;
     gainSmoother.reset(sampleRate, duration);
+
+    coeff = 1.f - std::exp(-1.f / (tau * float(sampleRate)));
 }
 
 void Parameters::reset() noexcept
@@ -90,10 +92,17 @@ void Parameters::reset() noexcept
 void Parameters::update() noexcept
 {
     gainSmoother.setTargetValue(juce::Decibels::decibelsToGain(gainParam->get()));
-    delayTime = delayTimeParam->get();
+    
+    targetDelayTime = delayTimeParam->get();
+    if (delayTime == 0.f)
+    {
+        delayTime = targetDelayTime;
+    }
+
 }
 
 void Parameters::smoothen() noexcept
 {
     gain = gainSmoother.getNextValue();
+    delayTime += (targetDelayTime - delayTime) * coeff;
 }
