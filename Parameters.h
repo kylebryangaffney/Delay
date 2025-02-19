@@ -10,6 +10,7 @@
 
 #pragma once
 #include <JuceHeader.h>
+#include "Parameters.h"
 
 const juce::ParameterID gainParamID{ "gain", 1 };
 const juce::ParameterID delayTimeParamID{ "delayTime", 1 };
@@ -50,5 +51,7 @@ private:
 
     juce::AudioParameterFloat* mixParam;
     juce::LinearSmoothedValue<float> mixSmoother;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Parameters);
 
 };
