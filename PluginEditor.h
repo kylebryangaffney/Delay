@@ -3,10 +3,8 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "RotaryKnob.h"
+#include "LookAndFeel.h"
 
-//==============================================================================
-/**
-*/
 class DelayAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:

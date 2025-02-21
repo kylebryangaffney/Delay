@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "RotaryKnob.h"
+#include "LookAndFeel.h"
 
 
 RotaryKnob::RotaryKnob(const juce::String& text, 
@@ -27,6 +28,8 @@ RotaryKnob::RotaryKnob(const juce::String& text,
     label.setBorderSize(juce::BorderSize<int>{0, 0, 2, 0});
     label.attachToComponent(&slider, false);
     addAndMakeVisible(label);
+
+    setLookAndFeel(RotaryKnobLookAndFeel::get());
 
     setSize(70, 110);
 
