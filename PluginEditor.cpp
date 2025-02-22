@@ -5,6 +5,9 @@
 DelayAudioProcessorEditor::DelayAudioProcessorEditor (DelayAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
+
+    setLookAndFeel(&mainLF);
+
     delayGroup.setText("Delay");
     delayGroup.setTextLabelPosition(juce::Justification::horizontallyCentred);
     delayGroup.addAndMakeVisible(delayTimeKnob);
@@ -20,13 +23,14 @@ DelayAudioProcessorEditor::DelayAudioProcessorEditor (DelayAudioProcessor& p)
     outputGroup.addAndMakeVisible(mixKnob);
     addAndMakeVisible(outputGroup);
 
-    //gainKnob.slider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::green);
+    // gainKnob.slider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::green);
 
     setSize (500, 330);
 }
 
 DelayAudioProcessorEditor::~DelayAudioProcessorEditor()
 {
+    setLookAndFeel(nullptr);
 }
 
 //==============================================================================
