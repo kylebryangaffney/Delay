@@ -19,7 +19,7 @@ private:
 
     DelayAudioProcessor& audioProcessor;
 
-    RotaryKnob gainKnob {"Output Gain", audioProcessor.apvts, gainParamID};
+    RotaryKnob gainKnob {"Output Gain", audioProcessor.apvts, gainParamID ,true};
     RotaryKnob mixKnob{ "Mix", audioProcessor.apvts, mixParamID };
     RotaryKnob delayTimeKnob{ "Delay Time", audioProcessor.apvts, delayTimeParamID };
 
