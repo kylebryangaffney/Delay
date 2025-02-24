@@ -15,6 +15,7 @@
 const juce::ParameterID gainParamID{ "gain", 1 };
 const juce::ParameterID delayTimeParamID{ "delayTime", 1 };
 const juce::ParameterID mixParamID{ "mix", 1 };
+const juce::ParameterID feedbackParamID{ "feedback", 1 };
 
 
 class Parameters
@@ -36,6 +37,7 @@ public:
     static constexpr float maxDelayTime = 2500.f;
 
     float mix = 1.f;
+    float feedback = 0.f;
 
 
 private:
@@ -43,6 +45,8 @@ private:
     juce::AudioParameterFloat* gainParam;
     juce::AudioParameterFloat* delayTimeParam;
     juce::LinearSmoothedValue<float> gainSmoother;
+    juce::AudioParameterFloat* feedbackParam;
+    juce::LinearSmoothedValue<float> feedbackSmoother;
 
 
     float targetDelayTime = 0.f;

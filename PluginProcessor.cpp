@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "ProtectYourEars.h"
 
 //==============================================================================
 DelayAudioProcessor::DelayAudioProcessor() :
@@ -97,6 +98,9 @@ void DelayAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     delayLine.setMaximumDelayInSamples(maxDelayInSamples);
     delayLine.reset();
 
+    feedbackL = 0.f;
+    feedbackR = 0.f;
+
     DBG(maxDelayInSamples);
 }
 
@@ -132,32 +136,31 @@ void DelayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, [[mayb
     float* channelDataR = buffer.getWritePointer(1);
 
   
-    for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
-    {
+    for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
         params.smoothen();
-
-        float delayInSamples = params.delayTime / 1000.f * sampleRate;
+        float delayInSamples = params.delayTime / 1000.0f * sampleRate;
         delayLine.setDelay(delayInSamples);
-
         float dryL = channelDataL[sample];
         float dryR = channelDataR[sample];
 
-        delayLine.pushSample(0, dryL);
-        delayLine.pushSample(1, dryR);
-
+        delayLine.pushSample(0, dryL + feedbackL);
+        delayLine.pushSample(1, dryR + feedbackR);
         float wetL = delayLine.popSample(0);
         float wetR = delayLine.popSample(1);
 
-        wetL += delayLine.popSample(0, delayInSamples * 2.f, false) * 7.f;
-        wetR += delayLine.popSample(1, delayInSamples * 2.f, false) * 7.f;
-
-
+        feedbackL = wetL * params.feedback;
+        feedbackR = wetR * params.feedback;
         float mixL = dryL * (1.f - params.mix) + wetL * params.mix;
         float mixR = dryR * (1.f - params.mix) + wetR * params.mix;
-
         channelDataL[sample] = mixL * params.gain;
         channelDataR[sample] = mixR * params.gain;
+
     }
+
+#if JUCE_DEBUG
+    protectYourEars(buffer);
+#endif
+
 }
 
 //==============================================================================

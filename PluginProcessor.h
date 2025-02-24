@@ -4,9 +4,6 @@
 #include "Parameters.h"
 
 
-//==============================================================================
-/**
-*/
 class DelayAudioProcessor  : public juce::AudioProcessor
 {
 public:
@@ -55,10 +52,13 @@ public:
 private:
     //==============================================================================
    
+    float feedbackL = 0.f;
+    float feedbackR = 0.f;
 
     juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> delayLine;
 
     Parameters params;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DelayAudioProcessor)
 };
