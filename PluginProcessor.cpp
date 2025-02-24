@@ -148,6 +148,9 @@ void DelayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, [[mayb
         float wetL = delayLine.popSample(0);
         float wetR = delayLine.popSample(1);
 
+        wetL += delayLine.popSample(0, delayInSamples * 2.f, false) * 7.f;
+        wetR += delayLine.popSample(1, delayInSamples * 2.f, false) * 7.f;
+
 
         float mixL = dryL * (1.f - params.mix) + wetL * params.mix;
         float mixR = dryR * (1.f - params.mix) + wetR * params.mix;
