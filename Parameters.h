@@ -10,12 +10,12 @@
 
 #pragma once
 #include <JuceHeader.h>
-#include "Parameters.h"
 
 const juce::ParameterID gainParamID{ "gain", 1 };
 const juce::ParameterID delayTimeParamID{ "delayTime", 1 };
 const juce::ParameterID mixParamID{ "mix", 1 };
 const juce::ParameterID feedbackParamID{ "feedback", 1 };
+const juce::ParameterID stereoParamID{ "stereo", 1 };
 
 
 class Parameters
@@ -39,22 +39,26 @@ public:
     float mix = 1.f;
     float feedback = 0.f;
 
+    float panL = 0.f;
+    float panR = 1.f;
+
 
 private:
 
     juce::AudioParameterFloat* gainParam;
     juce::AudioParameterFloat* delayTimeParam;
     juce::LinearSmoothedValue<float> gainSmoother;
+    juce::AudioParameterFloat* mixParam;
+    juce::LinearSmoothedValue<float> mixSmoother;
     juce::AudioParameterFloat* feedbackParam;
     juce::LinearSmoothedValue<float> feedbackSmoother;
+    juce::AudioParameterFloat* stereoParam;
+    juce::LinearSmoothedValue<float> stereoSmoother;
 
 
     float targetDelayTime = 0.f;
     float tau = 0.1f; // 100ms for parameters::prepareToPlay()
     float coeff = 0.f; // one pole smoothing 
-
-    juce::AudioParameterFloat* mixParam;
-    juce::LinearSmoothedValue<float> mixSmoother;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Parameters);
 
