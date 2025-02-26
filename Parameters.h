@@ -16,7 +16,10 @@ const juce::ParameterID delayTimeParamID{ "delayTime", 1 };
 const juce::ParameterID mixParamID{ "mix", 1 };
 const juce::ParameterID feedbackParamID{ "feedback", 1 };
 const juce::ParameterID stereoParamID{ "stereo", 1 };
-
+const juce::ParameterID lowCutParamID{ "lowCut", 1 };
+const juce::ParameterID highCutParamID{ "highCut", 1 };
+const juce::ParameterID lowQFactor{ "lowQFactor", 1 };
+const juce::ParameterID highQFactor{ "highQFactor", 1 };
 
 class Parameters
 {
@@ -29,18 +32,16 @@ public:
     void prepareToPlay(double sampleRate) noexcept;
     void reset() noexcept;
     void smoothen() noexcept;
-
     float gain = 0.f;
     float delayTime = 0.f;
-
     static constexpr float minDelayTime = 1.f;
     static constexpr float maxDelayTime = 2500.f;
-
     float mix = 1.f;
     float feedback = 0.f;
-
     float panL = 0.f;
     float panR = 1.f;
+    float lowCut = 20.f;
+    float highCut = 20000.f;
 
 
 private:
@@ -54,6 +55,10 @@ private:
     juce::LinearSmoothedValue<float> feedbackSmoother;
     juce::AudioParameterFloat* stereoParam;
     juce::LinearSmoothedValue<float> stereoSmoother;
+    juce::AudioParameterFloat* lowCutParam;
+    juce::LinearSmoothedValue<float> lowCutSmoother;
+    juce::AudioParameterFloat* highCutParam;
+    juce::LinearSmoothedValue<float> highCutSmoother;
 
 
     float targetDelayTime = 0.f;

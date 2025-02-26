@@ -54,6 +54,11 @@ private:
    
     float feedbackL = 0.f;
     float feedbackR = 0.f;
+    juce::dsp::StateVariableTPTFilter<float> lowCutFilter;
+    juce::dsp::StateVariableTPTFilter<float> highCutFilter;
+
+    float lastLowCut = -1.f;
+    float lastHighCut = -1.f;
 
     juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> delayLine;
 

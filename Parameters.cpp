@@ -63,6 +63,27 @@ static juce::String stringFromPercent(float value, int)
     return juce::String(int(value)) + " %";
 }
 
+static juce::String stringFromHz(float value, int)
+{
+    if (value < 1000.f)
+        return juce::String(int(value)) + " Hz";
+    else if (value < 10000.f)
+        return juce::String(value / 1000.f, 2) + " kHz";
+    else
+        return juce::String(value / 1000.f, 1) + " kHz";
+}
+
+static float hzFromString(const juce::String& str)
+{
+    float value = str.getFloatValue();
+
+    if (value < 20.f)
+        return value * 1000.f;
+
+    return value;
+}
+
+
 Parameters::Parameters(juce::AudioProcessorValueTreeState& apvts)
 {
     castParameter(apvts, gainParamID, gainParam);
@@ -70,6 +91,8 @@ Parameters::Parameters(juce::AudioProcessorValueTreeState& apvts)
     castParameter(apvts, mixParamID, mixParam);
     castParameter(apvts, feedbackParamID, feedbackParam);
     castParameter(apvts, stereoParamID, stereoParam);
+    castParameter(apvts, lowCutParamID, lowCutParam);
+    castParameter(apvts, highCutParamID, highCutParam);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout Parameters::createParameterLayout()
@@ -125,6 +148,28 @@ juce::AudioProcessorValueTreeState::ParameterLayout Parameters::createParameterL
             .withStringFromValueFunction(stringFromPercent)
         ));
 
+    layout.add(std::make_unique<juce::AudioParameterFloat>
+        (
+            lowCutParamID,
+            "Low Cut",
+            juce::NormalisableRange<float>(20.f, 15000.f, 1, 0.3f),
+            20.f,
+            juce::AudioParameterFloatAttributes()
+            .withStringFromValueFunction(stringFromHz)
+            .withValueFromStringFunction(hzFromString)
+        ));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>
+        (
+            highCutParamID,
+            "High Cut",
+            juce::NormalisableRange<float>(1000.f, 20000.f, 1, 0.3f),
+            20000.f,
+            juce::AudioParameterFloatAttributes()
+            .withStringFromValueFunction(stringFromHz)
+            .withValueFromStringFunction(hzFromString)
+        ));
+
     return layout;
 }
 
@@ -137,6 +182,8 @@ void Parameters::prepareToPlay(double sampleRate) noexcept
     mixSmoother.reset(sampleRate, duration);
     feedbackSmoother.reset(sampleRate, duration);
     stereoSmoother.reset(sampleRate, duration);
+    lowCutSmoother.reset(sampleRate, duration);
+    highCutSmoother.reset(sampleRate, duration);
 }
 
 void Parameters::reset() noexcept
@@ -154,6 +201,12 @@ void Parameters::reset() noexcept
 
     panL = 0.f;
     panR = 1.f;
+
+    lowCut = 20.f;
+    lowCutSmoother.setCurrentAndTargetValue(lowCutParam->get());
+
+    highCut = 20000.f;
+    highCutSmoother.setCurrentAndTargetValue(highCutParam->get());
 }
 
 void Parameters::update() noexcept
@@ -169,6 +222,8 @@ void Parameters::update() noexcept
     mixSmoother.setTargetValue(mixParam->get() * 0.01f);
     feedbackSmoother.setTargetValue(feedbackParam->get() * 0.01f);
     stereoSmoother.setTargetValue(stereoParam->get() * 0.01f);
+    lowCutSmoother.setTargetValue(lowCutParam->get());
+    highCutSmoother.setTargetValue(highCutParam->get());
 
 }
 
@@ -179,4 +234,6 @@ void Parameters::smoothen() noexcept
     mix = mixSmoother.getNextValue();
     feedback = feedbackSmoother.getNextValue();    
     panningEqualPower(stereoSmoother.getNextValue(), panL, panR);
+    lowCut = lowCutSmoother.getNextValue();
+    highCut = highCutSmoother.getNextValue();
 }
