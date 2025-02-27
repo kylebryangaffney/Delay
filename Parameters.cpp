@@ -83,6 +83,16 @@ static float hzFromString(const juce::String& str)
     return value;
 }
 
+static juce::String stringFromDecimal(float value, int)
+{
+    return juce::String(value, 3);
+}
+
+static float decimalFromString(const juce::String& str)
+{
+    float value = str.getFloatValue();
+    return value;
+}
 
 Parameters::Parameters(juce::AudioProcessorValueTreeState& apvts)
 {
@@ -93,6 +103,7 @@ Parameters::Parameters(juce::AudioProcessorValueTreeState& apvts)
     castParameter(apvts, stereoParamID, stereoParam);
     castParameter(apvts, lowCutParamID, lowCutParam);
     castParameter(apvts, highCutParamID, highCutParam);
+    castParameter(apvts, qFactorParamID, qFactorParam);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout Parameters::createParameterLayout()
@@ -170,6 +181,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout Parameters::createParameterL
             .withValueFromStringFunction(hzFromString)
         ));
 
+    layout.add(std::make_unique<juce::AudioParameterFloat>
+        (
+            qFactorParamID,
+            "Q Factor",
+            juce::NormalisableRange<float>(0.5f, 10.f, 0.001f, 0.25f),
+            0.707f,
+            juce::AudioParameterFloatAttributes()
+            .withStringFromValueFunction(stringFromDecimal)
+            .withValueFromStringFunction(decimalFromString)
+        ));
+
     return layout;
 }
 
@@ -184,6 +206,7 @@ void Parameters::prepareToPlay(double sampleRate) noexcept
     stereoSmoother.reset(sampleRate, duration);
     lowCutSmoother.reset(sampleRate, duration);
     highCutSmoother.reset(sampleRate, duration);
+    qFactorSmoother.reset(sampleRate, duration);
 }
 
 void Parameters::reset() noexcept
@@ -207,6 +230,8 @@ void Parameters::reset() noexcept
 
     highCut = 20000.f;
     highCutSmoother.setCurrentAndTargetValue(highCutParam->get());
+
+    qFactorSmoother.setCurrentAndTargetValue(qFactorParam->get());
 }
 
 void Parameters::update() noexcept
@@ -224,6 +249,7 @@ void Parameters::update() noexcept
     stereoSmoother.setTargetValue(stereoParam->get() * 0.01f);
     lowCutSmoother.setTargetValue(lowCutParam->get());
     highCutSmoother.setTargetValue(highCutParam->get());
+    qFactorSmoother.setTargetValue(qFactorParam->get());
 
 }
 
@@ -236,4 +262,5 @@ void Parameters::smoothen() noexcept
     panningEqualPower(stereoSmoother.getNextValue(), panL, panR);
     lowCut = lowCutSmoother.getNextValue();
     highCut = highCutSmoother.getNextValue();
+    qFactorSmoother.getNextValue();
 }

@@ -59,6 +59,8 @@ private:
 
     float lastLowCut = -1.f;
     float lastHighCut = -1.f;
+    float lastQFactor = -1.f;
+
 
     juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> delayLine;
 

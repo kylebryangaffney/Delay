@@ -142,14 +142,15 @@ bool DelayAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) co
 }
 #endif
 
-void DelayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, [[maybe_unused]] juce::MidiBuffer& midiMessages)
+
+void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe_unused]] juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
     int totalNumInputChannels = getTotalNumInputChannels();
     int totalNumOutputChannels = getTotalNumOutputChannels();
 
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+    for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+        buffer.clear(i, 0, buffer.getNumSamples());
 
     params.update();
 
@@ -169,6 +170,8 @@ void DelayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, [[mayb
     float* outputDataL = mainOutput.getWritePointer(0);
     float* outputDataR = mainOutput.getWritePointer(isMainOutputStereo ? 1 : 0);
 
+
+
     if (isMainOutputStereo)
     {
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
@@ -177,19 +180,21 @@ void DelayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, [[mayb
             float delayInSamples = params.delayTime / 1000.0f * sampleRate;
             delayLine.setDelay(delayInSamples);
 
-            if (params.lowCut != lastLowCut)
+            if (params.lowCut != lastLowCut || params.qFactor != lastQFactor)
             {
+                lowCutFilter.setResonance(params.qFactor);
                 lowCutFilter.setCutoffFrequency(params.lowCut);
                 lastLowCut = params.lowCut;
-
             }
-            
-            if (params.highCut != lastHighCut)
+
+            if (params.highCut != lastHighCut || params.qFactor != lastQFactor)
             {
+                highCutFilter.setResonance(params.qFactor);
                 highCutFilter.setCutoffFrequency(params.highCut);
                 lastHighCut = params.highCut;
             }
-            
+
+            lastQFactor = params.qFactor;
 
             float dryL = inputDataL[sample];
             float dryR = inputDataR[sample];
@@ -222,15 +227,33 @@ void DelayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, [[mayb
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
             params.smoothen();
-
             float delayInSamples = params.delayTime / 1000.f * sampleRate;
             delayLine.setDelay(delayInSamples);
+            if (params.lowCut != lastLowCut || params.qFactor != lastQFactor)
+            {
+                lowCutFilter.setResonance(params.qFactor);
+                lowCutFilter.setCutoffFrequency(params.lowCut);
+                lastLowCut = params.lowCut;
+            }
+
+            if (params.highCut != lastHighCut || params.qFactor != lastQFactor)
+            {
+                highCutFilter.setResonance(params.qFactor);
+                highCutFilter.setCutoffFrequency(params.highCut);
+                lastHighCut = params.highCut;
+            }
+
+            lastQFactor = params.qFactor;
 
             float dry = inputDataL[sample];
             delayLine.pushSample(0, dry + feedbackL);
 
+
             float wet = delayLine.popSample(0);
             feedbackL = wet * params.feedback;
+            feedbackL = lowCutFilter.processSample(0, feedbackL);
+            feedbackL = highCutFilter.processSample(0, feedbackL);
+
 
             float mix = dry * (1.f - params.mix) + wet * params.mix;
             outputDataL[sample] = mix * params.gain;
@@ -242,6 +265,8 @@ void DelayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, [[mayb
 #endif
 
 }
+
+
 
 //==============================================================================
 bool DelayAudioProcessor::hasEditor() const
