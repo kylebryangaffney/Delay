@@ -11,6 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+
 namespace Colors
 {
     const juce::Colour background{ 245, 240, 235 };

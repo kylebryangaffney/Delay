@@ -111,6 +111,11 @@ void DelayAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     lastLowCut = -1.f;
     lastHighCut = -1.f;
 
+    drive = 0.f;
+    waveShaper.prepare(spec);
+    waveShaper.functionToUse = [](float x) { return std::tanh(x); };
+
+
     DBG(maxDelayInSamples);
 }
 
@@ -171,9 +176,10 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
     float* outputDataR = mainOutput.getWritePointer(isMainOutputStereo ? 1 : 0);
 
 
-
     if (isMainOutputStereo)
     {
+        drive = params.drive;
+
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
             params.smoothen();
@@ -206,6 +212,12 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
 
             float wetL = delayLine.popSample(0);
             float wetR = delayLine.popSample(1);
+
+            if (drive > 0)
+            {
+                wetL = waveShaper.processSample(drive * wetL);
+                wetR = waveShaper.processSample(drive * wetR);
+            }
 
             feedbackL = wetL * params.feedback;
             feedbackL = lowCutFilter.processSample(0, feedbackL);
@@ -246,14 +258,19 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
             lastQFactor = params.qFactor;
 
             float dry = inputDataL[sample];
+
             delayLine.pushSample(0, dry + feedbackL);
 
-
             float wet = delayLine.popSample(0);
+
+            if (drive > 0)
+            {
+                wet = waveShaper.processSample(drive * wet);
+            }
+
             feedbackL = wet * params.feedback;
             feedbackL = lowCutFilter.processSample(0, feedbackL);
             feedbackL = highCutFilter.processSample(0, feedbackL);
-
 
             float mix = dry * (1.f - params.mix) + wet * params.mix;
             outputDataL[sample] = mix * params.gain;

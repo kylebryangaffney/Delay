@@ -104,6 +104,7 @@ Parameters::Parameters(juce::AudioProcessorValueTreeState& apvts)
     castParameter(apvts, lowCutParamID, lowCutParam);
     castParameter(apvts, highCutParamID, highCutParam);
     castParameter(apvts, qFactorParamID, qFactorParam);
+    castParameter(apvts, driveParamID, driveParam);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout Parameters::createParameterLayout()
@@ -192,6 +193,19 @@ juce::AudioProcessorValueTreeState::ParameterLayout Parameters::createParameterL
             .withValueFromStringFunction(decimalFromString)
         ));
 
+    layout.add(std::make_unique<juce::AudioParameterFloat>
+        (
+            driveParamID,
+            "Drive",
+            juce::NormalisableRange<float>(0.f, 100.f, 1.f),
+            0.0f,
+            juce::AudioParameterFloatAttributes()
+            .withStringFromValueFunction(stringFromPercent)
+        ));
+
+
+
+
     return layout;
 }
 
@@ -207,6 +221,7 @@ void Parameters::prepareToPlay(double sampleRate) noexcept
     lowCutSmoother.reset(sampleRate, duration);
     highCutSmoother.reset(sampleRate, duration);
     qFactorSmoother.reset(sampleRate, duration);
+    driveSmoother.reset(sampleRate, duration);
 }
 
 void Parameters::reset() noexcept
@@ -214,24 +229,19 @@ void Parameters::reset() noexcept
     gain = 0.f;
     gainSmoother.setCurrentAndTargetValue(juce::Decibels::decibelsToGain(gainParam->get()));
     delayTime = 0.f;
-
     mix = 1.f;
     mixSmoother.setCurrentAndTargetValue(mixParam->get() * 0.01f);
-
     feedback = 0.f;
     feedbackSmoother.setCurrentAndTargetValue(feedbackParam->get() * 0.01f);
     stereoSmoother.setCurrentAndTargetValue(stereoParam->get() * 0.01f);
-
     panL = 0.f;
     panR = 1.f;
-
     lowCut = 20.f;
     lowCutSmoother.setCurrentAndTargetValue(lowCutParam->get());
-
     highCut = 20000.f;
     highCutSmoother.setCurrentAndTargetValue(highCutParam->get());
-
     qFactorSmoother.setCurrentAndTargetValue(qFactorParam->get());
+    driveSmoother.setCurrentAndTargetValue(driveParam->get());
 }
 
 void Parameters::update() noexcept
@@ -250,6 +260,7 @@ void Parameters::update() noexcept
     lowCutSmoother.setTargetValue(lowCutParam->get());
     highCutSmoother.setTargetValue(highCutParam->get());
     qFactorSmoother.setTargetValue(qFactorParam->get());
+    driveSmoother.setTargetValue(driveParam->get());
 
 }
 
@@ -262,5 +273,6 @@ void Parameters::smoothen() noexcept
     panningEqualPower(stereoSmoother.getNextValue(), panL, panR);
     lowCut = lowCutSmoother.getNextValue();
     highCut = highCutSmoother.getNextValue();
-    qFactorSmoother.getNextValue();
+    qFactor = qFactorSmoother.getNextValue();
+    drive = driveSmoother.getNextValue();
 }

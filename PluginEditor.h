@@ -27,6 +27,7 @@ private:
     RotaryKnob lowCutKnob{ "Low Cut", audioProcessor.apvts, lowCutParamID };
     RotaryKnob highCutKnob{ "High Cut", audioProcessor.apvts, highCutParamID };
     RotaryKnob qFactorKnob{ "Q Factor", audioProcessor.apvts, qFactorParamID };
+    RotaryKnob driveKnob{ "Drive", audioProcessor.apvts, driveParamID };
 
     juce::GroupComponent delayGroup, feedbackGroup, outputGroup;
 

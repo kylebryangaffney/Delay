@@ -1,6 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <juce_dsp/juce_dsp.h>
 #include "Parameters.h"
 
 
@@ -61,6 +62,9 @@ private:
     float lastHighCut = -1.f;
     float lastQFactor = -1.f;
 
+    float drive = 0.f;
+
+    juce::dsp::WaveShaper<float> waveShaper;
 
     juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> delayLine;
 
