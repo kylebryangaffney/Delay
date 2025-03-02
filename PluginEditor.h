@@ -28,6 +28,14 @@ private:
     RotaryKnob highCutKnob{ "High Cut", audioProcessor.apvts, highCutParamID };
     RotaryKnob qFactorKnob{ "Q Factor", audioProcessor.apvts, qFactorParamID };
     RotaryKnob driveKnob{ "Drive", audioProcessor.apvts, driveParamID };
+    RotaryKnob delayNoteKnob{ "Note", audioProcessor.apvts, delayNoteParamID };
+    juce::TextButton tempoSyncButton;
+
+    juce::AudioProcessorValueTreeState::ButtonAttachment tempoSyncAttachment
+    {
+        audioProcessor.apvts, tempoSyncParamID.getParamID(), tempoSyncButton
+    };
+
 
     juce::GroupComponent delayGroup, feedbackGroup, outputGroup;
 

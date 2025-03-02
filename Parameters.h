@@ -20,6 +20,8 @@ const juce::ParameterID lowCutParamID{ "lowCut", 1 };
 const juce::ParameterID highCutParamID{ "highCut", 1 };
 const juce::ParameterID qFactorParamID{ "qFactor", 1 };
 const juce::ParameterID driveParamID{ "drive", 1 };
+const juce::ParameterID tempoSyncParamID{ "tempoSync", 1 };
+const juce::ParameterID delayNoteParamID{ "delayNote", 1 };
 
 class Parameters
 {
@@ -44,6 +46,8 @@ public:
     float highCut = 20000.f;
     float qFactor = 0.707f;
     float drive = 0.f;
+    int delayNote = 0;
+    bool tempoSync = false;
 
 
 private:
@@ -65,6 +69,8 @@ private:
     juce::LinearSmoothedValue<float> qFactorSmoother;
     juce::AudioParameterFloat* driveParam;
     juce::LinearSmoothedValue<float> driveSmoother;
+    juce::AudioParameterBool* tempoSyncParam;
+    juce::AudioParameterChoice* delayNoteParam;
 
 
     float targetDelayTime = 0.f;
