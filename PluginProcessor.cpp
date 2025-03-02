@@ -213,19 +213,19 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
             float wetL = delayLine.popSample(0);
             float wetR = delayLine.popSample(1);
 
-            if (drive > 0)
-            {
-                wetL = waveShaper.processSample(drive * wetL);
-                wetR = waveShaper.processSample(drive * wetR);
-            }
-
             feedbackL = wetL * params.feedback;
-            feedbackL = lowCutFilter.processSample(0, feedbackL);
-            feedbackL = highCutFilter.processSample(0, feedbackL);
+            wetL = lowCutFilter.processSample(0, wetL);
+            wetL = highCutFilter.processSample(0, wetL);
 
             feedbackR = wetR * params.feedback;
-            feedbackR = lowCutFilter.processSample(1, feedbackR);
-            feedbackR = highCutFilter.processSample(1, feedbackR);
+            wetR = lowCutFilter.processSample(1, wetR);
+            wetR = highCutFilter.processSample(1, wetR);
+
+            if (drive > 0)
+            {
+                wetL = waveShaper.processSample(wetL * drive * 0.9f);
+                wetR = waveShaper.processSample(wetR * drive * 0.9f);
+            }
 
             float mixL = dryL * (1.f - params.mix) + wetL * params.mix;
             float mixR = dryR * (1.f - params.mix) + wetR * params.mix;
@@ -263,14 +263,13 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
 
             float wet = delayLine.popSample(0);
 
+            feedbackL = wet * params.feedback;
+            wet = lowCutFilter.processSample(0, wet);
+            wet = highCutFilter.processSample(0, wet);
             if (drive > 0)
             {
-                wet = waveShaper.processSample(drive * wet);
+                wet = waveShaper.processSample(wet * drive * 0.9f);
             }
-
-            feedbackL = wet * params.feedback;
-            feedbackL = lowCutFilter.processSample(0, feedbackL);
-            feedbackL = highCutFilter.processSample(0, feedbackL);
 
             float mix = dry * (1.f - params.mix) + wet * params.mix;
             outputDataL[sample] = mix * params.gain;
