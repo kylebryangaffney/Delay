@@ -37,7 +37,7 @@ public:
     float gain = 0.f;
     float delayTime = 0.f;
     static constexpr float minDelayTime = 1.f;
-    static constexpr float maxDelayTime = 2500.f;
+    static constexpr float maxDelayTime = 5000.f;
     float mix = 1.f;
     float feedback = 0.f;
     float panL = 0.f;

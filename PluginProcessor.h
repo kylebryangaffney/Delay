@@ -3,6 +3,8 @@
 #include <JuceHeader.h>
 #include <juce_dsp/juce_dsp.h>
 #include "Parameters.h"
+#include "Tempo.h"
+
 
 
 class DelayAudioProcessor  : public juce::AudioProcessor
@@ -63,6 +65,8 @@ private:
     float lastQFactor = -1.f;
 
     float drive = 0.f;
+
+    Tempo tempo;
 
     juce::dsp::WaveShaper<float> waveShaper;
 

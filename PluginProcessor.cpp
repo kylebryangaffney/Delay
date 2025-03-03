@@ -115,6 +115,8 @@ void DelayAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     waveShaper.prepare(spec);
     waveShaper.functionToUse = [](float x) { return std::tanh(x); };
 
+    tempo.reset();
+
 
     DBG(maxDelayInSamples);
 }
@@ -158,9 +160,18 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
         buffer.clear(i, 0, buffer.getNumSamples());
 
     params.update();
+    tempo.update(getPlayHead());
+
+    float syncedTime = float(tempo.getMillisecondsForNoteLength(params.delayNote));
+    if (syncedTime > Parameters::maxDelayTime)
+    {
+        syncedTime = Parameters::maxDelayTime;
+    }
 
     float sampleRate = float(getSampleRate());
-    float delayInSamples = params.delayTime / 1000.f * sampleRate;
+
+    float delayTime = params.tempoSync ? syncedTime : params.delayTime;
+    float delayInSamples = delayTime / 1000.f * sampleRate;
     delayLine.setDelay(delayInSamples);
 
     juce::AudioBuffer mainInput = getBusBuffer(buffer, true, 0);
