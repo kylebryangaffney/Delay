@@ -49,6 +49,9 @@ public:
     int delayNote = 0;
     bool tempoSync = false;
 
+    juce::AudioParameterBool* tempoSyncParam;
+
+
 
 private:
 
@@ -69,7 +72,6 @@ private:
     juce::LinearSmoothedValue<float> qFactorSmoother;
     juce::AudioParameterFloat* driveParam;
     juce::LinearSmoothedValue<float> driveSmoother;
-    juce::AudioParameterBool* tempoSyncParam;
     juce::AudioParameterChoice* delayNoteParam;
 
 
