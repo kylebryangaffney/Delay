@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include <juce_dsp/juce_dsp.h>
+#include "DelayLine.h"
 #include "Parameters.h"
 #include "Tempo.h"
 
@@ -53,6 +54,7 @@ public:
     };
 
     Parameters params;
+    std::atomic<float> levelL, levelR;
 
 
 private:
@@ -73,7 +75,7 @@ private:
 
     juce::dsp::WaveShaper<float> waveShaper;
 
-    juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> delayLine;
+    DelayLine delayLineL, delayLineR;
 
 
 
