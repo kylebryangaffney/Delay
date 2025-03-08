@@ -87,8 +87,8 @@ void DelayAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     params.prepareToPlay(sampleRate);
     params.reset();
 
-    levelL.store(0.f);
-    levelR.store(0.f);
+    levelL.reset();
+    levelR.reset();
 
     juce::dsp::ProcessSpec spec;
     spec.sampleRate = sampleRate;
@@ -295,8 +295,8 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
         }
     }
 
-    levelL.store(maxL);
-    levelR.store(maxR);
+    levelL.updateIfGreater(maxL);
+    levelR.updateIfGreater(maxR);
 
 #if JUCE_DEBUG
     protectYourEars(buffer);

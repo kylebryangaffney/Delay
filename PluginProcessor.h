@@ -4,6 +4,7 @@
 #include <juce_dsp/juce_dsp.h>
 #include "DelayLine.h"
 #include "Parameters.h"
+#include "Measurement.h"
 #include "Tempo.h"
 
 
@@ -54,7 +55,8 @@ public:
     };
 
     Parameters params;
-    std::atomic<float> levelL, levelR;
+
+    Measurement levelL, levelR;
 
 
 private:

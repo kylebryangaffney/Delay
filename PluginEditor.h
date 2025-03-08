@@ -5,6 +5,7 @@
 #include "RotaryKnob.h"
 #include "LookAndFeel.h"
 #include "Parameters.h"
+#include "LevelMeter.h"
 
 class DelayAudioProcessorEditor  : public juce::AudioProcessorEditor,
     private juce::AudioProcessorParameter::Listener
@@ -37,6 +38,8 @@ private:
     RotaryKnob driveKnob{ "Drive", audioProcessor.apvts, driveParamID };
     RotaryKnob delayNoteKnob{ "Note", audioProcessor.apvts, delayNoteParamID };
     juce::TextButton tempoSyncButton;
+
+    LevelMeter meter;
 
     juce::AudioProcessorValueTreeState::ButtonAttachment tempoSyncAttachment
     {
