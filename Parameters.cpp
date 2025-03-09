@@ -144,13 +144,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout Parameters::createParameterL
 
     layout.add(std::make_unique<juce::AudioParameterFloat>
         (
-        feedbackParamID,
-        "Feedback",
-        juce::NormalisableRange<float>(-90.0f, 90.0f, 1.0f),
-        0.0f,
-        juce::AudioParameterFloatAttributes()
-        .withStringFromValueFunction(stringFromPercent)
-    ));
+            feedbackParamID,
+            "Feedback",
+            juce::NormalisableRange<float>(-90.0f, 90.0f, 1.0f),
+            0.0f,
+            juce::AudioParameterFloatAttributes()
+            .withStringFromValueFunction(stringFromPercent)
+        ));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>
         (
@@ -208,25 +208,25 @@ juce::AudioProcessorValueTreeState::ParameterLayout Parameters::createParameterL
     layout.add(std::make_unique<juce::AudioParameterBool>
         (tempoSyncParamID, "Tempo Sync", false));
 
-    juce::StringArray noteLengths = 
-        {
-            "1/32",
-            "1/16 trip",
-            "1/32 dot",
-            "1/16",
-            "1/8 trip",
-            "1/16 dot",
-            "1/8",
-            "1/4 trip",
-            "1/8 dot",
-            "1/4",
-            "1/2 trip",
-            "1/4 dot",
-            "1/2",
-            "1/1 trip",
-            "1/2 dot",
-            "1/1",
-        };
+    juce::StringArray noteLengths =
+    {
+        "1/32",
+        "1/16 trip",
+        "1/32 dot",
+        "1/16",
+        "1/8 trip",
+        "1/16 dot",
+        "1/8",
+        "1/4 trip",
+        "1/8 dot",
+        "1/4",
+        "1/2 trip",
+        "1/4 dot",
+        "1/2",
+        "1/1 trip",
+        "1/2 dot",
+        "1/1",
+    };
 
     layout.add(std::make_unique<juce::AudioParameterChoice>
         (delayNoteParamID, "Delay Note", noteLengths, 9));
@@ -272,7 +272,7 @@ void Parameters::reset() noexcept
 void Parameters::update() noexcept
 {
     gainSmoother.setTargetValue(juce::Decibels::decibelsToGain(gainParam->get()));
-    
+
     targetDelayTime = delayTimeParam->get();
     if (delayTime == 0.f)
     {
@@ -296,11 +296,10 @@ void Parameters::smoothen() noexcept
     gain = gainSmoother.getNextValue();
     delayTime += (targetDelayTime - delayTime) * coeff;
     mix = mixSmoother.getNextValue();
-    feedback = feedbackSmoother.getNextValue();    
+    feedback = feedbackSmoother.getNextValue();
     panningEqualPower(stereoSmoother.getNextValue(), panL, panR);
     lowCut = lowCutSmoother.getNextValue();
     highCut = highCutSmoother.getNextValue();
     qFactor = qFactorSmoother.getNextValue();
     drive = driveSmoother.getNextValue();
 }
-

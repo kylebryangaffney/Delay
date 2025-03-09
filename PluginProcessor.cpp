@@ -8,7 +8,7 @@ DelayAudioProcessor::DelayAudioProcessor() :
         BusesProperties()
         .withInput("Input", juce::AudioChannelSet::stereo(), true)
         .withOutput("Output", juce::AudioChannelSet::stereo(), true)
-    ), 
+    ),
     params(apvts)
 {
     lowCutFilter.setType(juce::dsp::StateVariableTPTFilterType::highpass);
@@ -27,29 +27,29 @@ const juce::String DelayAudioProcessor::getName() const
 
 bool DelayAudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
+#if JucePlugin_WantsMidiInput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool DelayAudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
+#if JucePlugin_ProducesMidiOutput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool DelayAudioProcessor::isMidiEffect() const
 {
-   #if JucePlugin_IsMidiEffect
+#if JucePlugin_IsMidiEffect
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 double DelayAudioProcessor::getTailLengthSeconds() const
@@ -60,7 +60,7 @@ double DelayAudioProcessor::getTailLengthSeconds() const
 int DelayAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
-                // so this should be at least 1, even if you're not really implementing programs.
+    // so this should be at least 1, even if you're not really implementing programs.
 }
 
 int DelayAudioProcessor::getCurrentProgram()
@@ -68,21 +68,21 @@ int DelayAudioProcessor::getCurrentProgram()
     return 0;
 }
 
-void DelayAudioProcessor::setCurrentProgram (int index)
+void DelayAudioProcessor::setCurrentProgram(int index)
 {
 }
 
-const juce::String DelayAudioProcessor::getProgramName (int index)
+const juce::String DelayAudioProcessor::getProgramName(int index)
 {
     return {};
 }
 
-void DelayAudioProcessor::changeProgramName (int index, const juce::String& newName)
+void DelayAudioProcessor::changeProgramName(int index, const juce::String& newName)
 {
 }
 
 //==============================================================================
-void DelayAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void DelayAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     params.prepareToPlay(sampleRate);
     params.reset();
@@ -102,7 +102,7 @@ void DelayAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     delayLineR.setMaximumDelayInSamples(maxDelayInSamples);
     delayLineL.reset();
     delayLineR.reset();
-    
+
     feedbackL = 0.f;
     feedbackR = 0.f;
 
@@ -132,14 +132,14 @@ void DelayAudioProcessor::releaseResources()
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool DelayAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool DelayAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
 {
     const juce::AudioChannelSet mono = juce::AudioChannelSet::mono();
     const juce::AudioChannelSet stereo = juce::AudioChannelSet::stereo();
     const juce::AudioChannelSet mainIn = layouts.getMainInputChannelSet();
     const juce::AudioChannelSet mainOut = layouts.getMainOutputChannelSet();
 
-    DBG("isBusesLayoutSupported, in: " << mainIn.getDescription() 
+    DBG("isBusesLayoutSupported, in: " << mainIn.getDescription()
         << ", out: " << mainOut.getDescription());
 
     if (mainIn == mono && mainOut == mono)
@@ -200,7 +200,7 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
         {
             params.smoothen();
             float delayInSamples = params.delayTime / 1000.0f * sampleRate;
-           
+
             if (params.lowCut != lastLowCut || params.qFactor != lastQFactor)
             {
                 lowCutFilter.setResonance(params.qFactor);
@@ -256,10 +256,13 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
     }
     else
     {
+        drive = params.drive;
+
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
             params.smoothen();
-            float delayInSamples = params.delayTime / 1000.f * sampleRate;
+            float delayInSamples = params.delayTime / 1000.0f * sampleRate;
+
             if (params.lowCut != lastLowCut || params.qFactor != lastQFactor)
             {
                 lowCutFilter.setResonance(params.qFactor);
@@ -276,22 +279,29 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
 
             lastQFactor = params.qFactor;
 
-            float dry = inputDataL[sample];
+            float dryL = inputDataL[sample];
 
-            delayLineL.write(dry + feedbackL);
+            delayLineL.write(dryL * params.panL + feedbackR);
 
-            float wet = delayLineL.read(delayInSamples);
+            float wetL = delayLineL.read(delayInSamples);
 
-            feedbackL = wet * params.feedback;
-            wet = lowCutFilter.processSample(0, wet);
-            wet = highCutFilter.processSample(0, wet);
+            feedbackL = wetL * params.feedback;
+            wetL = lowCutFilter.processSample(0, wetL);
+            wetL = highCutFilter.processSample(0, wetL);
+
             if (drive > 0)
             {
-                wet = waveShaper.processSample(wet * drive * 0.9f);
+                wetL = waveShaper.processSample(wetL * drive * 0.9f);
             }
 
-            float mix = dry * (1.f - params.mix) + wet * params.mix;
-            outputDataL[sample] = mix * params.gain;
+            float mixL = dryL * (1.f - params.mix) + wetL * params.mix;
+
+            float outL = mixL * params.gain;
+            outputDataL[sample] = outL;
+            outputDataR[sample] = outL;
+            maxL = std::max(maxL, std::abs(outL));
+            maxR = std::max(maxR, std::abs(outL));
+
         }
     }
 
@@ -314,17 +324,17 @@ bool DelayAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* DelayAudioProcessor::createEditor()
 {
-    return new DelayAudioProcessorEditor (*this);
+    return new DelayAudioProcessorEditor(*this);
 }
 
 //==============================================================================
-void DelayAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+void DelayAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
     copyXmlToBinary(*apvts.copyState().createXml(), destData);
     //DBG(apvts.copyState().toXmlString());
 }
 
-void DelayAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void DelayAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
     std::unique_ptr<juce::XmlElement> xml(getXmlFromBinary(data, sizeInBytes));
     if (xml.get() != nullptr && xml->hasTagName(apvts.state.getType()))
@@ -339,4 +349,3 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new DelayAudioProcessor();
 }
-

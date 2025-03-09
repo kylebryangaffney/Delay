@@ -12,7 +12,7 @@
 #include "LevelMeter.h"
 #include "LookAndFeel.h"
 
-//==============================================================================
+
 LevelMeter::LevelMeter(Measurement& measurementL_, Measurement& measurementR_) 
     : measurementL(measurementL_), measurementR(measurementR_)
 {
