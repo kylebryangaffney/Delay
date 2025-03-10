@@ -70,7 +70,13 @@ private:
     float lastLowCut = -1.f;
     float lastHighCut = -1.f;
     float lastQFactor = -1.f;
-
+    float delayInSamples = 0.f;
+    float targetDelay = 0.f;
+    float fade = 0.f;
+    float fadeTarget = 0.f;
+    float coeff = 0.f;
+    float wait = 0.f;
+    float waitInc = 0.f;
     float drive = 0.f;
 
     Tempo tempo;
