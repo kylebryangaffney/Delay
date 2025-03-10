@@ -39,6 +39,16 @@ DelayAudioProcessorEditor::DelayAudioProcessorEditor (DelayAudioProcessor& p)
     outputGroup.addAndMakeVisible(meter);
     addAndMakeVisible(outputGroup);
 
+    auto bypassIcon = juce::ImageCache::getFromMemory(BinaryData::Bypass_png, BinaryData::Bypass_pngSize);
+    bypassButton.setClickingTogglesState(true);
+    bypassButton.setBounds(0, 0, 20, 20);
+    bypassButton.setImages(false, true, true,
+        bypassIcon, 1.f, juce::Colours::white,
+        bypassIcon, 1.f, juce::Colours::white,
+        bypassIcon, 1.f, juce::Colours::grey,
+        0.f);
+    addAndMakeVisible(bypassButton);
+
     // gainKnob.slider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::green);
 
     setSize (500, 440);
@@ -105,6 +115,7 @@ void DelayAudioProcessorEditor::resized()
     qFactorKnob.setTopLeftPosition(lowCutKnob.getX(), lowCutKnob.getBottom() + 10);
     driveKnob.setTopLeftPosition(qFactorKnob.getRight() + 20, lowCutKnob.getBottom() + 10);
     meter.setBounds(outputGroup.getWidth() - 45, 30, 30, gainKnob.getBottom() - 30);
+    bypassButton.setTopLeftPosition(bounds.getRight() - bypassButton.getWidth() - 10, 10);
 }
 
 void DelayAudioProcessorEditor::parameterValueChanged(int, float value)

@@ -22,6 +22,7 @@ const juce::ParameterID qFactorParamID{ "qFactor", 1 };
 const juce::ParameterID driveParamID{ "drive", 1 };
 const juce::ParameterID tempoSyncParamID{ "tempoSync", 1 };
 const juce::ParameterID delayNoteParamID{ "delayNote", 1 };
+const juce::ParameterID bypassParamID{ "bypass", 1 };
 
 class Parameters
 {
@@ -48,8 +49,10 @@ public:
     float drive = 0.f;
     int delayNote = 0;
     bool tempoSync = false;
+    bool bypassed = false;
 
     juce::AudioParameterBool* tempoSyncParam;
+    juce::AudioParameterBool* bypassParam;
 
 
 

@@ -172,6 +172,11 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
         buffer.clear(i, 0, buffer.getNumSamples());
 
     params.update();
+    
+    if (params.bypassed)
+    {
+        return;
+    }
     tempo.update(getPlayHead());
 
     float syncedTime = float(tempo.getMillisecondsForNoteLength(params.delayNote));
@@ -285,6 +290,12 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
 
             float outL = mixL * params.gain;
             float outR = mixR * params.gain;
+
+            if (params.bypassed)
+            {
+                outL = dryL;
+                outR = dryR;
+            }
             outputDataL[sample] = outL;
             outputDataR[sample] = outR;
             maxL = std::max(maxL, std::abs(outL));
@@ -349,6 +360,11 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
             float mixL = dryL * (1.f - params.mix) + wetL * params.mix;
 
             float outL = mixL * params.gain;
+
+            if (params.bypassed)
+            {
+                outL = dryL;
+            }
             outputDataL[sample] = outL;
             outputDataR[sample] = outL;
             maxL = std::max(maxL, std::abs(outL));
@@ -394,6 +410,12 @@ void DelayAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
         apvts.replaceState(juce::ValueTree::fromXml(*xml));
     }
 }
+
+juce::AudioProcessorParameter* DelayAudioProcessor::getBypassParameter() const
+{
+    return params.bypassParam;
+}
+
 
 //==============================================================================
 // This creates new instances of the plugin..

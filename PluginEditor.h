@@ -24,7 +24,6 @@ private:
 
     void updateDelayKnobs(bool tempoSyncActive);
 
-
     DelayAudioProcessor& audioProcessor;
 
     RotaryKnob gainKnob{ "Output Gain", audioProcessor.apvts, gainParamID ,true };
@@ -47,6 +46,12 @@ private:
     };
 
     juce::GroupComponent delayGroup, feedbackGroup, outputGroup;
+
+    juce::ImageButton bypassButton;
+    juce::AudioProcessorValueTreeState::ButtonAttachment bypassAttachment
+    {
+        audioProcessor.apvts, bypassParamID.getParamID(), bypassButton
+    };
 
     MainLookAndFeel mainLF;
 
