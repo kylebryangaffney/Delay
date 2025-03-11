@@ -13,6 +13,8 @@ DelayAudioProcessor::DelayAudioProcessor() :
 {
     lowCutFilter.setType(juce::dsp::StateVariableTPTFilterType::highpass);
     highCutFilter.setType(juce::dsp::StateVariableTPTFilterType::lowpass);
+    waveShaper.functionToUse = [](float x) { return std::tanh(x); };
+
 }
 
 DelayAudioProcessor::~DelayAudioProcessor()
@@ -117,8 +119,6 @@ void DelayAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 
     drive = 0.f;
     waveShaper.prepare(spec);
-    waveShaper.functionToUse = [](float x) { return std::tanh(x); };
-
     tempo.reset();
 
     delayInSamples = 0.f;
@@ -172,7 +172,7 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
         buffer.clear(i, 0, buffer.getNumSamples());
 
     params.update();
-    
+
     if (params.bypassed)
     {
         return;
