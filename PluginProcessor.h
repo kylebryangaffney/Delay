@@ -80,13 +80,15 @@ private:
     float waitInc = 0.f;
     float drive = 0.f;
 
+    float bypassFade = 1.0f;
+    float bypassFadeInc = 0.0f;
+    bool isBypassing = false;
+
     Tempo tempo;
 
     juce::dsp::WaveShaper<float> waveShaper;
 
     DelayLine delayLineL, delayLineR;
-
-
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DelayAudioProcessor)
 };

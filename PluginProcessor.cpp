@@ -129,6 +129,9 @@ void DelayAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     wait = 0.f;
     waitInc = 1.f / (0.25f * float(sampleRate)); // 250ms
 
+    bypassFade = 1.0f;
+    bypassFadeInc = static_cast<float>(1.0 / (0.1 * sampleRate)); // 100ms
+
 
     DBG(maxDelayInSamples);
 }
@@ -173,10 +176,17 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
 
     params.update();
 
-    if (params.bypassed)
+    if (params.bypassed && bypassFade >= 1.0f)
     {
         return;
     }
+
+    if (params.bypassed && bypassFade < 1.0f)
+        bypassFade += bypassFadeInc;
+
+    else if (!params.bypassed && bypassFade > 0.0f)
+        bypassFade -= bypassFadeInc;
+
     tempo.update(getPlayHead());
 
     float syncedTime = float(tempo.getMillisecondsForNoteLength(params.delayNote));
@@ -291,11 +301,15 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
             float outL = mixL * params.gain;
             float outR = mixR * params.gain;
 
-            if (params.bypassed)
-            {
-                outL = dryL;
-                outR = dryR;
-            }
+            outL = (1.0f - bypassFade) * outL + bypassFade * dryL;
+            outR = (1.0f - bypassFade) * outR + bypassFade * dryR;
+
+            if (params.bypassed && bypassFade < 1.0f)
+                bypassFade += bypassFadeInc;
+
+            else if (!params.bypassed && bypassFade > 0.0f)
+                bypassFade -= bypassFadeInc;
+
             outputDataL[sample] = outL;
             outputDataR[sample] = outR;
             maxL = std::max(maxL, std::abs(outL));
@@ -361,10 +375,14 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
 
             float outL = mixL * params.gain;
 
-            if (params.bypassed)
-            {
-                outL = dryL;
-            }
+            outL = (1.0f - bypassFade) * outL + bypassFade * dryL;
+
+            if (params.bypassed && bypassFade < 1.0f)
+                bypassFade += bypassFadeInc;
+
+            else if (!params.bypassed && bypassFade > 0.0f)
+                bypassFade -= bypassFadeInc;
+
             outputDataL[sample] = outL;
             outputDataR[sample] = outL;
             maxL = std::max(maxL, std::abs(outL));
