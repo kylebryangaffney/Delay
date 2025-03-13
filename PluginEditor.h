@@ -6,6 +6,7 @@
 #include "LookAndFeel.h"
 #include "Parameters.h"
 #include "LevelMeter.h"
+#include "Gui/PresetPanel.h"
 
 class DelayAudioProcessorEditor  : public juce::AudioProcessorEditor,
     private juce::AudioProcessorParameter::Listener
@@ -55,6 +56,7 @@ private:
 
     MainLookAndFeel mainLF;
 
+    Gui::PresetPanel presetPanel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DelayAudioProcessorEditor)
 };

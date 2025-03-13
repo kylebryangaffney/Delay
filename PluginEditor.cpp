@@ -5,7 +5,6 @@
 DelayAudioProcessorEditor::DelayAudioProcessorEditor (DelayAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p), meter(p.levelL, p.levelR)
 {
-
     setLookAndFeel(&mainLF);
 
     delayGroup.setText("Delay");
@@ -48,6 +47,8 @@ DelayAudioProcessorEditor::DelayAudioProcessorEditor (DelayAudioProcessor& p)
         bypassIcon, 1.f, juce::Colours::grey,
         0.f);
     addAndMakeVisible(bypassButton);
+
+    addAndMakeVisible(presetPanel);
 
     // gainKnob.slider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::green);
 
@@ -116,6 +117,8 @@ void DelayAudioProcessorEditor::resized()
     driveKnob.setTopLeftPosition(qFactorKnob.getRight() + 20, lowCutKnob.getBottom() + 10);
     meter.setBounds(outputGroup.getWidth() - 45, 30, 30, gainKnob.getBottom() - 30);
     bypassButton.setTopLeftPosition(bounds.getRight() - bypassButton.getWidth() - 10, 10);
+
+    presetPanel.setBounds(getLocalBounds().removeFromTop(proportionOfWidth(0.1f)));
 }
 
 void DelayAudioProcessorEditor::parameterValueChanged(int, float value)
