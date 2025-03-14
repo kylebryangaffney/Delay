@@ -19,10 +19,10 @@ namespace Gui
     public:
         PresetPanel()
         {
-            configureButton(saveButton, "save");
-            configureButton(deleteButton, "delete");
-            configureButton(previousPresetButton, "<");
-            configureButton(nextPresetButton, ">");
+            configureButton(saveButton, "Save");
+            configureButton(deleteButton, "Delete");
+            configureButton(previousPresetButton, "<-");
+            configureButton(nextPresetButton, "->");
 
             presetList.setTextWhenNothingSelected("No Preset Selected");
             presetList.setMouseCursor(juce::MouseCursor::PointingHandCursor);
@@ -55,14 +55,20 @@ namespace Gui
         juce::TextButton saveButton, deleteButton, previousPresetButton, nextPresetButton;
         juce::ComboBox presetList;
 
-        void buttonClicked(juce::Button*) override;
-        void comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged) override;
+        void buttonClicked(juce::Button*) override
+        {
+            return;
+        }
+        void comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged) override
+        {
+            return;
+        }
 
         void configureButton(juce::Button& button, const juce::String& buttontext)
         {
             button.setButtonText(buttontext);
             button.setMouseCursor(juce::MouseCursor::PointingHandCursor);
-            addAndMakeVisible(saveButton);
+            addAndMakeVisible(button);
             button.addListener(this);
 
         }

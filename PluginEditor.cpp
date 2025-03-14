@@ -52,7 +52,7 @@ DelayAudioProcessorEditor::DelayAudioProcessorEditor (DelayAudioProcessor& p)
 
     // gainKnob.slider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::green);
 
-    setSize (500, 440);
+    setSize (500, 490);
 
     updateDelayKnobs(audioProcessor.params.tempoSyncParam->get());
     audioProcessor.params.tempoSyncParam->addListener(this);
@@ -98,27 +98,34 @@ void DelayAudioProcessorEditor::resized()
 {
     auto bounds = getLocalBounds();
 
-    int y = 50;
-    int height = bounds.getHeight() - 60;
+    int headerHeight = 50;
+    int presetPanelHeight = 40;
+    int padding = 10;
+    int y = headerHeight + presetPanelHeight + padding; // Adjusted y value
 
-    delayGroup.setBounds(10, y, 110, height);
-    outputGroup.setBounds(bounds.getWidth() - 160, y, 150, height);
-    feedbackGroup.setBounds(delayGroup.getRight() + 10, y, outputGroup.getX() - delayGroup.getRight() - 20, height);
+    presetPanel.setBounds(bounds.getX() + 10, headerHeight, bounds.getWidth() - 20, presetPanelHeight);
+
+    delayGroup.setBounds(10, y, 110, bounds.getHeight() - y - padding);
+    outputGroup.setBounds(bounds.getWidth() - 160, y, 150, bounds.getHeight() - y - padding);
+    feedbackGroup.setBounds(delayGroup.getRight() + 10, y, outputGroup.getX() - delayGroup.getRight() - 20, bounds.getHeight() - y - padding);
+
     delayTimeKnob.setTopLeftPosition(20, 20);
     tempoSyncButton.setTopLeftPosition(20, delayTimeKnob.getBottom() + 10);
     delayNoteKnob.setTopLeftPosition(delayTimeKnob.getX(), delayTimeKnob.getY());
+
     mixKnob.setTopLeftPosition(20, 20);
     gainKnob.setTopLeftPosition(mixKnob.getX(), mixKnob.getBottom() + 10);
+
     feedbackKnob.setTopLeftPosition(20, 20);
     stereoKnob.setTopLeftPosition(feedbackKnob.getRight() + 20, 20);
     lowCutKnob.setTopLeftPosition(feedbackKnob.getX(), feedbackKnob.getBottom() + 10);
     highCutKnob.setTopLeftPosition(lowCutKnob.getRight() + 20, lowCutKnob.getY());
     qFactorKnob.setTopLeftPosition(lowCutKnob.getX(), lowCutKnob.getBottom() + 10);
     driveKnob.setTopLeftPosition(qFactorKnob.getRight() + 20, lowCutKnob.getBottom() + 10);
-    meter.setBounds(outputGroup.getWidth() - 45, 30, 30, gainKnob.getBottom() - 30);
-    bypassButton.setTopLeftPosition(bounds.getRight() - bypassButton.getWidth() - 10, 10);
 
-    presetPanel.setBounds(getLocalBounds().removeFromTop(proportionOfWidth(0.1f)));
+    meter.setBounds(outputGroup.getWidth() - 45, 30, 30, gainKnob.getBottom() - 30);
+
+    bypassButton.setTopLeftPosition(bounds.getWidth() - bypassButton.getWidth() - 10, 10);
 }
 
 void DelayAudioProcessorEditor::parameterValueChanged(int, float value)
