@@ -21,8 +21,8 @@ namespace Gui
         {
             configureButton(saveButton, "Save");
             configureButton(deleteButton, "Delete");
-            configureButton(previousPresetButton, "<-");
-            configureButton(nextPresetButton, "->");
+            configureButton(previousPresetButton, "<");
+            configureButton(nextPresetButton, ">");
 
             presetList.setTextWhenNothingSelected("No Preset Selected");
             presetList.setMouseCursor(juce::MouseCursor::PointingHandCursor);

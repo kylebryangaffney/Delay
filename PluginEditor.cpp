@@ -101,7 +101,7 @@ void DelayAudioProcessorEditor::resized()
     int headerHeight = 50;
     int presetPanelHeight = 40;
     int padding = 10;
-    int y = headerHeight + presetPanelHeight + padding; // Adjusted y value
+    int y = headerHeight + presetPanelHeight + padding;
 
     presetPanel.setBounds(bounds.getX() + 10, headerHeight, bounds.getWidth() - 20, presetPanelHeight);
 
