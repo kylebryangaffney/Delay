@@ -105,15 +105,37 @@ namespace Service
 
     void PresetManager::loadNextPreset()
     {
+        const auto allPresets = getAllPresets();
+        if (allPresets.isEmpty())
+            return;
+
+        const int currentIndex = allPresets.indexOf(currentPreset);
+        const int nextIndex = currentIndex + 1 > (allPresets.size() - 1) ? 0 : currentIndex + 1;
+
+        loadPreset(allPresets.getReference(nextIndex));
     }
 
     void PresetManager::loadPreviousPreset()
     {
+        const auto allPresets = getAllPresets();
+        if (allPresets.isEmpty())
+            return;
+
+        const int currentIndex = allPresets.indexOf(currentPreset);
+        const int previousIndex = currentIndex - 1 < 0 ? allPresets.size() - 1 : currentIndex - 1;
+
+        loadPreset(allPresets.getReference(previousIndex));
     }
 
     juce::StringArray PresetManager::getAllPresets() const
     {
         juce::StringArray presetList;
+        const auto fileArray = defaultDirectory.findChildFiles(juce::File::TypesOfFileToFind::findFiles, false, "*." + extension);
+
+        for (const auto& file : fileArray)
+        {
+            presetList.add(file.getFileNameWithoutExtension());
+        }
         return presetList;
     }
 
