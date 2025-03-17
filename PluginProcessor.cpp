@@ -9,7 +9,7 @@ DelayAudioProcessor::DelayAudioProcessor() :
         .withInput("Input", juce::AudioChannelSet::stereo(), true)
         .withOutput("Output", juce::AudioChannelSet::stereo(), true)
     ),
-    params(apvts)
+    params(apvts), presetManager(apvts)
 {
     lowCutFilter.setType(juce::dsp::StateVariableTPTFilterType::highpass);
     highCutFilter.setType(juce::dsp::StateVariableTPTFilterType::lowpass);

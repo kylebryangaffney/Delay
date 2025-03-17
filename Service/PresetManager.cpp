@@ -65,12 +65,13 @@ namespace Service
         }
 
         const auto presetFile = defaultDirectory.getChildFile(presetName + "." + extension);
-        if (presetFile.exists())
+        if (!presetFile.existsAsFile())
         {
             DBG("Preset File: " + presetFile.getFullPathName() + " does not exist");
             jassertfalse;
             return;
         }
+
         if (!presetFile.deleteFile())
         {
             DBG("Could not delete Preset File: " + presetFile.getFullPathName());

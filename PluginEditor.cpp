@@ -3,7 +3,7 @@
 
 //==============================================================================
 DelayAudioProcessorEditor::DelayAudioProcessorEditor (DelayAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), meter(p.levelL, p.levelR)
+    : AudioProcessorEditor (&p), audioProcessor (p), meter(p.levelL, p.levelR), presetPanel(p.getPresetManager())
 {
     setLookAndFeel(&mainLF);
 

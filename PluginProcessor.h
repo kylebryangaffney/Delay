@@ -5,6 +5,7 @@
 #include "DelayLine.h"
 #include "Parameters.h"
 #include "Measurement.h"
+#include "Service/PresetManager.h"
 #include "Tempo.h"
 
 
@@ -59,6 +60,8 @@ public:
 
     Measurement levelL, levelR;
 
+    Service::PresetManager& getPresetManager() { return presetManager; }
+
 
 private:
     //==============================================================================
@@ -89,6 +92,8 @@ private:
     juce::dsp::WaveShaper<float> waveShaper;
 
     DelayLine delayLineL, delayLineR;
+
+    Service::PresetManager presetManager;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DelayAudioProcessor)
 };
