@@ -77,7 +77,6 @@ private:
     juce::LinearSmoothedValue<float> driveSmoother;
     juce::AudioParameterChoice* delayNoteParam;
 
-
     float targetDelayTime = 0.f;
     float tau = 0.1f; // 100ms for parameters::prepareToPlay()
     float coeff = 0.f; // one pole smoothing 

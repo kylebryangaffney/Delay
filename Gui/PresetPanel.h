@@ -28,11 +28,9 @@ namespace Gui
             presetList.setMouseCursor(juce::MouseCursor::PointingHandCursor);
             addAndMakeVisible(presetList);
             presetList.addListener(this);
+
+            loadPresetList();
             
-            const auto allPresets = presetManager.getAllPresets();
-            const auto currentPreset = presetManager.getCurrentPreset();
-            presetList.addItemList(allPresets, 1);
-            presetList.setSelectedItemIndex(allPresets.indexOf(currentPreset), false);
         }
 
         ~PresetPanel()
@@ -56,6 +54,15 @@ namespace Gui
             deleteButton.setBounds(bounds.reduced(4));
         }
 
+        void loadPresetList()
+        {
+            presetList.clear(juce::dontSendNotification);
+            const auto allPresets = presetManager.getAllPresets();
+            const auto currentPreset = presetManager.getCurrentPreset();
+            presetList.addItemList(allPresets, 1);
+            presetList.setSelectedItemIndex(allPresets.indexOf(currentPreset), false);
+        }
+
     private:
 
         juce::TextButton saveButton, deleteButton, previousPresetButton, nextPresetButton;
@@ -76,22 +83,27 @@ namespace Gui
                     {
                         const auto resultFile = chooser.getResult();
                         presetManager.savePreset(resultFile.getFileNameWithoutExtension());
+                        loadPresetList();
                     });
             }
 
             if (button == &previousPresetButton)
             {
-                presetManager.loadPreviousPreset();
+                const int index = presetManager.loadPreviousPreset();
+                presetList.setSelectedItemIndex(index, false);
+
             }
 
             if (button == &nextPresetButton)
             {
-                presetManager.loadNextPreset();
+                const int index = presetManager.loadNextPreset();
+                presetList.setSelectedItemIndex(index, false);
             }
 
             if (button == &deleteButton)
             {
                 presetManager.deletePreset(presetManager.getCurrentPreset());
+                loadPresetList();
             }
         }
         void comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged) override

@@ -60,7 +60,7 @@ public:
 
     Measurement levelL, levelR;
 
-    Service::PresetManager& getPresetManager() { return presetManager; }
+    Service::PresetManager& getPresetManager() { return *presetManager; }
 
 
 private:
@@ -93,7 +93,7 @@ private:
 
     DelayLine delayLineL, delayLineR;
 
-    Service::PresetManager presetManager;
+    std::unique_ptr<Service::PresetManager> presetManager;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DelayAudioProcessor)
 };

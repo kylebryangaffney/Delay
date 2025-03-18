@@ -9,12 +9,14 @@ DelayAudioProcessor::DelayAudioProcessor() :
         .withInput("Input", juce::AudioChannelSet::stereo(), true)
         .withOutput("Output", juce::AudioChannelSet::stereo(), true)
     ),
-    params(apvts), presetManager(apvts)
+    params(apvts)
 {
     lowCutFilter.setType(juce::dsp::StateVariableTPTFilterType::highpass);
     highCutFilter.setType(juce::dsp::StateVariableTPTFilterType::lowpass);
     waveShaper.functionToUse = [](float x) { return std::tanh(x); };
-
+    apvts.state.setProperty(Service::PresetManager::presetNameProperty, "", nullptr);
+    apvts.state.setProperty("version", ProjectInfo::versionString, nullptr);
+    presetManager = std::make_unique<Service::PresetManager>(apvts);
 }
 
 DelayAudioProcessor::~DelayAudioProcessor()
