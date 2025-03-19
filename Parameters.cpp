@@ -147,7 +147,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout Parameters::createParameterL
         (
             feedbackParamID,
             "Feedback",
-            juce::NormalisableRange<float>(-90.0f, 90.0f, 1.0f),
+            juce::NormalisableRange<float>(0.f, 90.0f, 1.0f),
             0.0f,
             juce::AudioParameterFloatAttributes()
             .withStringFromValueFunction(stringFromPercent)
@@ -157,7 +157,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout Parameters::createParameterL
         (
             stereoParamID,
             "Stereo",
-            juce::NormalisableRange<float>(-100.f, 100.f, 1.f),
+            juce::NormalisableRange<float>(0.f, 100.f, 1.f),
             0.f,
             juce::AudioParameterFloatAttributes()
             .withStringFromValueFunction(stringFromPercent)

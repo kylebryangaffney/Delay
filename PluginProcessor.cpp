@@ -72,16 +72,16 @@ int DelayAudioProcessor::getCurrentProgram()
     return 0;
 }
 
-void DelayAudioProcessor::setCurrentProgram(int index)
+void DelayAudioProcessor::setCurrentProgram(int)
 {
 }
 
-const juce::String DelayAudioProcessor::getProgramName(int index)
+const juce::String DelayAudioProcessor::getProgramName(int)
 {
     return {};
 }
 
-void DelayAudioProcessor::changeProgramName(int index, const juce::String& newName)
+void DelayAudioProcessor::changeProgramName(int, const juce::String&)
 {
 }
 
@@ -403,8 +403,6 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
 }
 
 
-
-//==============================================================================
 bool DelayAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)

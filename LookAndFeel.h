@@ -14,46 +14,46 @@
 
 namespace Colors
 {
-    const juce::Colour background{ 245, 240, 235 };
-    const juce::Colour header{ 40, 40, 40 };
+    const juce::Colour background{ 0, 0, 0 }; // Black background
+    const juce::Colour header{ 50, 50, 50 }; // Dark gray for headers
 
     namespace Knob
     {
-        const juce::Colour trackBackground{ 205, 200, 195 };
-        const juce::Colour trackActive{ 177, 101, 135 };
-        const juce::Colour outline{ 255, 250, 245 };
-        const juce::Colour gradientTop{ 250, 245, 240 };
-        const juce::Colour gradientBottom{ 240, 235, 230 };
-        const juce::Colour dial{ 100, 100, 100 };
-        const juce::Colour dropShadow{ 195, 190, 185 };
-        const juce::Colour label{ 80, 80, 80 };
-        const juce::Colour textBoxBackground{ 80, 80, 80 };
-        const juce::Colour value{ 240, 240, 240 };
-        const juce::Colour caret{ 255, 255, 255 };
+        const juce::Colour trackBackground{ 80, 80, 80 }; // Dark gray
+        const juce::Colour trackActive{ 230, 120, 50 }; // More saturated, darker orange
+        const juce::Colour outline{ 102, 51, 153 }; // Royal plum
+        const juce::Colour gradientTop{ 245, 140, 70 }; // Lighter shade of deep orange
+        const juce::Colour gradientBottom{ 230, 120, 50 }; // Darker, richer orange
+        const juce::Colour dial{ 150, 75, 180 }; // Medium plum
+        const juce::Colour dropShadow{ 30, 30, 30 }; // Dark gray shadow
+        const juce::Colour label{ 220, 220, 220 }; // Light gray text
+        const juce::Colour textBoxBackground{ 50, 50, 50 }; // Dark gray
+        const juce::Colour value{ 255, 255, 255 }; // White text
+        const juce::Colour caret{ 230, 120, 50 }; // Updated orange caret
     }
 
     namespace Group
     {
-        const juce::Colour label{ 160, 155, 150 };
-        const juce::Colour outline{ 235, 230, 225 };
+        const juce::Colour label{ 230, 120, 50 }; // Updated darker orange
+        const juce::Colour outline{ 102, 51, 153 }; // Royal plum outline
     }
 
     namespace Button
     {
-        const juce::Colour text{ 80, 80, 80 };
-        const juce::Colour textToggled{ 40, 40, 40 };
-        const juce::Colour background{ 245, 240, 235 };
-        const juce::Colour backgroundToggled{ 255, 250, 245 };
-        const juce::Colour outline{ 235, 230, 225 };
+        const juce::Colour text{ 230, 120, 50 }; // Updated deeper orange
+        const juce::Colour textToggled{ 255, 255, 255 }; // White when toggled
+        const juce::Colour background{ 50, 50, 50 }; // Dark gray
+        const juce::Colour backgroundToggled{ 102, 51, 153 }; // Royal plum when toggled
+        const juce::Colour outline{ 230, 120, 50 }; // Updated orange outline
     }
 
     namespace LevelMeter
     {
-        const juce::Colour background{ 245, 240, 235 };
-        const juce::Colour tickLine{ 200, 200, 200 };
-        const juce::Colour tickLabel{ 80, 80, 80 };
-        const juce::Colour tooLoud{ 226, 74, 81 };
-        const juce::Colour levelOK{ 65, 206, 88 };
+        const juce::Colour background{ 20, 20, 20 }; // Very dark gray
+        const juce::Colour tickLine{ 200, 200, 200 }; // Light gray tick marks
+        const juce::Colour tickLabel{ 230, 120, 50 }; // Updated orange labels
+        const juce::Colour tooLoud{ 226, 74, 81 }; // Red for overload
+        const juce::Colour levelOK{ 65, 206, 88 }; // Green for safe levels
     }
 }
 
@@ -95,7 +95,7 @@ public:
 
 private:
 
-    juce::DropShadow dropShadow { Colors::Knob::dropShadow, 6, {0, 3} };
+    juce::DropShadow dropShadow{ Colors::Knob::dropShadow, 6, {0, 3} };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RotaryKnobLookAndFeel)
 };
