@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "RotaryKnob.h"
+#include "AsymmetricalRotaryKnob.h"
 #include "LookAndFeel.h"
 #include "Parameters.h"
 #include "LevelMeter.h"
@@ -27,7 +28,8 @@ private:
 
     DelayAudioProcessor& audioProcessor;
 
-    RotaryKnob gainKnob{ "Output Gain", audioProcessor.apvts, gainParamID ,true };
+    AsymmetricalRotaryKnob gainKnob{ "Output Gain", audioProcessor.apvts, gainParamID };
+
     RotaryKnob mixKnob{ "Mix", audioProcessor.apvts, mixParamID };
     RotaryKnob delayTimeKnob{ "Delay Time", audioProcessor.apvts, delayTimeParamID };
     RotaryKnob feedbackKnob{ "Feedback", audioProcessor.apvts, feedbackParamID };

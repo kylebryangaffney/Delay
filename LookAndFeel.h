@@ -55,6 +55,13 @@ namespace Colors
         const juce::Colour tooLoud{ 226, 74, 81 }; // Red for overload
         const juce::Colour levelOK{ 65, 206, 88 }; // Green for safe levels
     }
+
+    namespace Slider
+    {
+        const juce::Colour sliderFill{ 160, 70, 220 };
+        const juce::Colour standoutFill{ 50, 200, 180 }; // Cyan for special slider
+    }
+
 }
 
 class Fonts

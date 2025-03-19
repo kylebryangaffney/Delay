@@ -23,7 +23,7 @@ RotaryKnobLookAndFeel::RotaryKnobLookAndFeel()
 {
     setColour(juce::Label::textColourId, Colors::Knob::label);
     setColour(juce::Slider::textBoxTextColourId, Colors::Knob::label);
-    setColour(juce::Slider::rotarySliderFillColourId, Colors::Knob::trackActive);
+    setColour(juce::Slider::rotarySliderFillColourId, Colors::Slider::sliderFill);
     setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     setColour(juce::CaretComponent::caretColourId, Colors::Knob::caret);
 }

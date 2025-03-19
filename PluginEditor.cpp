@@ -50,7 +50,7 @@ DelayAudioProcessorEditor::DelayAudioProcessorEditor (DelayAudioProcessor& p)
 
     addAndMakeVisible(presetPanel);
 
-    // gainKnob.slider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::green);
+    gainKnob.slider.setColour(juce::Slider::rotarySliderFillColourId, Colors::Slider::standoutFill);
 
     setSize (500, 490);
 
