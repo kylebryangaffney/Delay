@@ -441,3 +441,159 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new DelayAudioProcessor();
 }
+//----------------------------------------------------------------------------//
+void DelayAudioProcessor::initializeProcessing(juce::AudioBuffer<float>& buffer)
+{
+    int totalNumInputChannels = getTotalNumInputChannels();
+    int totalNumOutputChannels = getTotalNumOutputChannels();
+
+    for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+        buffer.clear(i, 0, buffer.getNumSamples());
+
+    params.update();
+}
+
+void DelayAudioProcessor::updateBypassState()
+{
+    if (params.bypassed && bypassFade >= 1.0f)
+    {
+        return;
+    }
+
+    if (params.bypassed && bypassFade < 1.0f)
+        bypassFade += bypassFadeInc;
+
+    else if (!params.bypassed && bypassFade > 0.0f)
+        bypassFade -= bypassFadeInc;
+}
+
+float DelayAudioProcessor::updateDelayTime()
+{
+    float syncedTime = float(tempo.getMillisecondsForNoteLength(params.delayNote));
+    if (syncedTime > Parameters::maxDelayTime)
+    {
+        syncedTime = Parameters::maxDelayTime;
+    }
+
+    float sampleRate = float(getSampleRate());
+    float delayTime = params.tempoSync ? syncedTime : params.delayTime;
+    float newTargetDelay = delayTime / 1000.f * sampleRate;
+
+    if (newTargetDelay != targetDelay)
+    {
+        targetDelay = newTargetDelay;
+
+        if (delayInSamples == 0.f) // first iteration
+            delayInSamples = targetDelay;
+
+        else //start counter and fade out
+        {
+            wait = waitInc;
+            fadeTarget = 0.f;
+        }
+    }
+
+    return delayInSamples;
+}
+
+void DelayAudioProcessor::processDelay(
+    juce::AudioBuffer<float>& buffer,
+    juce::AudioBuffer<float>& mainInput,
+    juce::AudioBuffer<float>& mainOutput,
+    float delayInSamples)
+{
+    int numChannels = mainInput.getNumChannels();
+
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        const float* input = mainInput.getReadPointer(ch);
+        float* output = mainOutput.getWritePointer(ch);
+
+        juce::dsp::DelayLine<float>& delayLine = (ch == 0) ? delayLineL : delayLineR;
+        float& feedbackSample = (ch == 0) ? feedbackL : feedbackR;
+        float& maxLevel = (ch == 0) ? maxL : maxR;
+
+        processDelayChannel(input, output, delayLine, ch, feedbackSample, delayInSamples, maxLevel);
+    }
+
+    // If mono output, duplicate channel 0
+    const int numSamples = buffer.getNumSamples();
+    if (mainOutput.getNumChannels() > 1 && mainInput.getNumChannels() == 1)
+    {
+        const float* outputL = mainOutput.getReadPointer(0);
+        float* outputR = mainOutput.getWritePointer(1);
+
+        std::copy(outputL, outputL + numSamples, outputR);
+    }
+}
+
+void DelayAudioProcessor::processDelayChannel(
+    const float* input, float* output,
+    juce::dsp::DelayLine<float>& delayLine,
+    int channelIndex,
+    float& feedbackSample,
+    float delayInSamples,
+    float& maxLevel)
+{
+    drive = params.drive;
+
+    for (int sample = 0; sample < getBlockSize(); ++sample)
+    {
+        params.smoothen();
+        updateFilters();
+
+        float dry = input[sample];
+
+        delayLine.write(dry * (channelIndex == 0 ? params.panL : params.panR) + feedbackSample);
+
+        float wet = delayLine.read(delayInSamples);
+
+        updateGainFade();
+        wet *= fade;
+
+        feedbackSample = wet * params.feedBack;
+
+        wet = processFilters(wet, channelIndex);
+
+        if (drive > 0)
+            wet = waveShaper.processSample(wet * drive * 0.9f);
+
+        float mix = dry * (1.f - params.mix) + wet * params.mix;
+        float out = mix * params.gain;
+        out = (1.f - bypassFade) * out + bypassFade * dry;
+
+        output[sample] = out;
+        maxLevel = std::max(maxLevel, std::abs(out));
+    }
+}
+
+
+void DelayAudioProcessor::updateFilters()
+{
+    if (params.lowCut != lastLowCut || params.qFactor != lastQFactor)
+    {
+        lowCutFilter.setResonance(params.qFactor);
+        lowCutFilter.setCutoffFrequency(params.lowCut);
+        lastLowCut = params.lowCut;
+    }
+
+    if (params.highCut != lastHighCut || params.qFactor != lastQFactor)
+    {
+        highCutFilter.setResonance(params.qFactor);
+        highCutFilter.setCutoffFrequency(params.lowCut);
+        lastHighCut = params.highCut;
+    }
+
+    lastQFactor = params.qFactor;
+}
+
+float DelayAudioProcessor::processFilters(float sample, int channel)
+{
+    sample = lowCutFilter.processSample(channel, sample);
+    return highCutFilter.processSample(channel, sample);
+}
+
+void DelayAudioProcessor::updateGainFade()
+{
+    fade += (fadeTarget - fade) * coeff;
+}

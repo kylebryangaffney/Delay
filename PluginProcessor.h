@@ -95,5 +95,21 @@ private:
 
     std::unique_ptr<Service::PresetManager> presetManager;
 
+
+    void initializeProcessing(juce::AudioBuffer<float>& buffer);
+    void updateBypassState();
+    float updateDelayTime();
+    void processDelay(juce::AudioBuffer<float>& buffer,
+        juce::AudioBuffer<float>& mainInput, juce::AudioBuffer<float>& mainOutput,
+        float delayInSamples);
+    void processDelayChannel(const float* input, float* output,
+        juce::dsp::DelayLine<float>& delayLine,
+        int channelIndex, float& feedbackSample,
+        float delayInSamples, float& maxLevel);
+
+    void updateFilters();
+    void processFilters(float sample, int channel);
+    void updateGainFade();
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DelayAudioProcessor)
 };
