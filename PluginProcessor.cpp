@@ -444,6 +444,8 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 //----------------------------------------------------------------------------//
 void DelayAudioProcessor::initializeProcessing(juce::AudioBuffer<float>& buffer)
 {
+    juce::ScopedNoDenormals noDenormals;
+
     int totalNumInputChannels = getTotalNumInputChannels();
     int totalNumOutputChannels = getTotalNumOutputChannels();
 
@@ -451,6 +453,7 @@ void DelayAudioProcessor::initializeProcessing(juce::AudioBuffer<float>& buffer)
         buffer.clear(i, 0, buffer.getNumSamples());
 
     params.update();
+
 }
 
 void DelayAudioProcessor::updateBypassState()
@@ -462,113 +465,48 @@ void DelayAudioProcessor::updateBypassState()
 
     if (params.bypassed && bypassFade < 1.0f)
         bypassFade += bypassFadeInc;
-
     else if (!params.bypassed && bypassFade > 0.0f)
         bypassFade -= bypassFadeInc;
 }
 
-float DelayAudioProcessor::updateDelayTime()
+float DelayAudioProcessor::getTempoSyncedDelay()
 {
+    tempo.update(getPlayHead());
+
+    // Calculate tempo-synced delay time in milliseconds
     float syncedTime = float(tempo.getMillisecondsForNoteLength(params.delayNote));
     if (syncedTime > Parameters::maxDelayTime)
     {
         syncedTime = Parameters::maxDelayTime;
     }
 
-    float sampleRate = float(getSampleRate());
-    float delayTime = params.tempoSync ? syncedTime : params.delayTime;
-    float newTargetDelay = delayTime / 1000.f * sampleRate;
+    return syncedTime;
+}
 
+float DelayAudioProcessor::convertMsToSamples(float sampleRate, float ms)
+{
+    return ms / 1000.f * sampleRate;
+}
+
+void DelayAudioProcessor::updateDelayTime(float newTargetDelay)
+{
     if (newTargetDelay != targetDelay)
     {
         targetDelay = newTargetDelay;
 
-        if (delayInSamples == 0.f) // first iteration
+        if (delayInSamples == 0.f) // First time setup
+        {
             delayInSamples = targetDelay;
-
-        else //start counter and fade out
+        }
+        else // Start fade transition to new delay time
         {
             wait = waitInc;
             fadeTarget = 0.f;
         }
     }
-
-    return delayInSamples;
 }
 
-void DelayAudioProcessor::processDelay(
-    juce::AudioBuffer<float>& buffer,
-    juce::AudioBuffer<float>& mainInput,
-    juce::AudioBuffer<float>& mainOutput,
-    float delayInSamples)
-{
-    int numChannels = mainInput.getNumChannels();
-
-    for (int ch = 0; ch < numChannels; ++ch)
-    {
-        const float* input = mainInput.getReadPointer(ch);
-        float* output = mainOutput.getWritePointer(ch);
-
-        juce::dsp::DelayLine<float>& delayLine = (ch == 0) ? delayLineL : delayLineR;
-        float& feedbackSample = (ch == 0) ? feedbackL : feedbackR;
-        float& maxLevel = (ch == 0) ? maxL : maxR;
-
-        processDelayChannel(input, output, delayLine, ch, feedbackSample, delayInSamples, maxLevel);
-    }
-
-    // If mono output, duplicate channel 0
-    const int numSamples = buffer.getNumSamples();
-    if (mainOutput.getNumChannels() > 1 && mainInput.getNumChannels() == 1)
-    {
-        const float* outputL = mainOutput.getReadPointer(0);
-        float* outputR = mainOutput.getWritePointer(1);
-
-        std::copy(outputL, outputL + numSamples, outputR);
-    }
-}
-
-void DelayAudioProcessor::processDelayChannel(
-    const float* input, float* output,
-    juce::dsp::DelayLine<float>& delayLine,
-    int channelIndex,
-    float& feedbackSample,
-    float delayInSamples,
-    float& maxLevel)
-{
-    drive = params.drive;
-
-    for (int sample = 0; sample < getBlockSize(); ++sample)
-    {
-        params.smoothen();
-        updateFilters();
-
-        float dry = input[sample];
-
-        delayLine.write(dry * (channelIndex == 0 ? params.panL : params.panR) + feedbackSample);
-
-        float wet = delayLine.read(delayInSamples);
-
-        updateGainFade();
-        wet *= fade;
-
-        feedbackSample = wet * params.feedBack;
-
-        wet = processFilters(wet, channelIndex);
-
-        if (drive > 0)
-            wet = waveShaper.processSample(wet * drive * 0.9f);
-
-        float mix = dry * (1.f - params.mix) + wet * params.mix;
-        float out = mix * params.gain;
-        out = (1.f - bypassFade) * out + bypassFade * dry;
-
-        output[sample] = out;
-        maxLevel = std::max(maxLevel, std::abs(out));
-    }
-}
-
-
-void DelayAudioProcessor::updateFilters()
+void DelayAudioProcessor::updateLowCut()
 {
     if (params.lowCut != lastLowCut || params.qFactor != lastQFactor)
     {
@@ -576,24 +514,31 @@ void DelayAudioProcessor::updateFilters()
         lowCutFilter.setCutoffFrequency(params.lowCut);
         lastLowCut = params.lowCut;
     }
+}
 
+void DelayAudioProcessor::updateHighCut()
+{
     if (params.highCut != lastHighCut || params.qFactor != lastQFactor)
     {
         highCutFilter.setResonance(params.qFactor);
-        highCutFilter.setCutoffFrequency(params.lowCut);
+        highCutFilter.setCutoffFrequency(params.highCut);
         lastHighCut = params.highCut;
     }
-
-    lastQFactor = params.qFactor;
 }
 
-float DelayAudioProcessor::processFilters(float sample, int channel)
-{
-    sample = lowCutFilter.processSample(channel, sample);
-    return highCutFilter.processSample(channel, sample);
-}
-
-void DelayAudioProcessor::updateGainFade()
+void DelayAudioProcessor::updateDelayFade()
 {
     fade += (fadeTarget - fade) * coeff;
+    wetL *= fade;
+
+    if (wait > 0.f)
+    {
+        wait += waitInc;
+        if (wait >= 1.f)
+        {
+            delayInSamples = targetDelay;
+            wait = 0.f;
+            fadeTarget = 1.f;
+        }
+    }
 }
