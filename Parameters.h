@@ -35,6 +35,7 @@ public:
     void prepareToPlay(double sampleRate) noexcept;
     void reset() noexcept;
     void smoothen() noexcept;
+    const float driveInputScale = 0.9;
     float gain = 0.f;
     float delayTime = 0.f;
     static constexpr float minDelayTime = 1.f;
@@ -43,6 +44,7 @@ public:
     float feedback = 0.f;
     float panL = 0.f;
     float panR = 1.f;
+    float stereo = 0.f;
     float lowCut = 20.f;
     float highCut = 20000.f;
     float qFactor = 0.707f;
@@ -80,6 +82,7 @@ private:
     float targetDelayTime = 0.f;
     float tau = 0.1f; // 100ms for parameters::prepareToPlay()
     float coeff = 0.f; // one pole smoothing 
+    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Parameters);
 

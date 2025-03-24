@@ -95,17 +95,17 @@ private:
 
     std::unique_ptr<Service::PresetManager> presetManager;
 
-
     void initializeProcessing(juce::AudioBuffer<float>& buffer);
-
     void updateBypassState();
     float getTempoSyncedDelay();
-    float convertMsToSamples(float sampleRate, float ms);
-
-    void updateDelayTime(float newTargetDelay);
-    void updateLowCut();
-    void updateHighCut();
-    float updateDelayFade(float wetL);
+    float convertMsToSamples(float& sampleRate, float& ms);
+    void updateDelayTime(float& newTargetDelay);
+    void updateLowCutFilter();
+    void updateHighCutFilter();
+    void applyDelayCrossfade(float& wet);
+    void processWetWithFeedback(float& wet, float& feedback, const int channel);
+    float getWetDryOutput(const float dry, const float wet);
+    void updateBypassFade();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DelayAudioProcessor)
 };

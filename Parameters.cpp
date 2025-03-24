@@ -167,7 +167,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout Parameters::createParameterL
         (
             lowCutParamID,
             "Low Cut",
-            juce::NormalisableRange<float>(20.f, 15000.f, 1, 0.3f),
+            juce::NormalisableRange<float>(20.f, 500.f, 1, 0.3f),
             20.f,
             juce::AudioParameterFloatAttributes()
             .withStringFromValueFunction(stringFromHz)
@@ -302,7 +302,9 @@ void Parameters::smoothen() noexcept
     delayTime = targetDelayTime;
     mix = mixSmoother.getNextValue();
     feedback = feedbackSmoother.getNextValue();
-    panningEqualPower(stereoSmoother.getNextValue(), panL, panR);
+    stereo = stereoSmoother.getNextValue();  // use for ping pong logic
+    panningEqualPower(0.5f, panL, panR);     // always center input
+
     lowCut = lowCutSmoother.getNextValue();
     highCut = highCutSmoother.getNextValue();
     qFactor = qFactorSmoother.getNextValue();
