@@ -19,17 +19,17 @@ namespace Colors
 
     namespace Knob
     {
-        const juce::Colour trackBackground{ 80, 80, 80 }; // Dark gray
-        const juce::Colour trackActive{ 230, 120, 50 }; // More saturated, darker orange
-        const juce::Colour outline{ 102, 51, 153 }; // Royal plum
-        const juce::Colour gradientTop{ 245, 140, 70 }; // Lighter shade of deep orange
-        const juce::Colour gradientBottom{ 230, 120, 50 }; // Darker, richer orange
-        const juce::Colour dial{ 150, 75, 180 }; // Medium plum
-        const juce::Colour dropShadow{ 30, 30, 30 }; // Dark gray shadow
-        const juce::Colour label{ 220, 220, 220 }; // Light gray text
-        const juce::Colour textBoxBackground{ 50, 50, 50 }; // Dark gray
-        const juce::Colour value{ 255, 255, 255 }; // White text
-        const juce::Colour caret{ 230, 120, 50 }; // Updated orange caret
+        const juce::Colour trackBackground{ 60, 60, 60 }; // Dim gray
+        const juce::Colour trackActive{ 255, 100, 0 }; // Electric tangerine
+        const juce::Colour outline{ 180, 70, 190 }; // Vibrant magenta-plum
+        const juce::Colour gradientTop{ 255, 130, 50 }; // Bright tangerine
+        const juce::Colour gradientBottom{ 245, 100, 45 }; // More glow, more balanced
+        const juce::Colour dial{ 200, 90, 255 }; // Glowing violet
+        const juce::Colour dropShadow{ 25, 25, 25 }; // Soft dark shadow
+        const juce::Colour label{ 220, 220, 220 }; // Light gray
+        const juce::Colour textBoxBackground{ 45, 45, 45 }; // Slightly darker gray
+        const juce::Colour value{ 255, 255, 255 }; // White
+        const juce::Colour caret{ 255, 100, 0 }; // Tangerine caret
     }
 
     namespace Group

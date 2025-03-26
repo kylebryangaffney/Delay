@@ -224,9 +224,6 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
             delayLineL.write(dryL * params.panL + pingPongFeedbackL);
             delayLineR.write(dryR * params.panR + pingPongFeedbackR);
 
-            delayLineL.write(dryL * params.panL + feedbackR);
-            delayLineR.write(dryR * params.panR + feedbackL);
-
             float wetL = delayLineL.read(delayInSamples);
             float wetR = delayLineR.read(delayInSamples);
 
@@ -245,14 +242,11 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
             float outL = getWetDryOutput(dryL, wetL);
             float outR = getWetDryOutput(dryR, wetR);
 
-            // Update bypass fade value
             updateBypassFade();
 
-            // Write to output buffer
             outputDataL[sample] = outL;
             outputDataR[sample] = outR;
 
-            // Track peak levels
             maxL = std::max(maxL, std::abs(outL));
             maxR = std::max(maxR, std::abs(outR));
         }
@@ -296,19 +290,17 @@ void DelayAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, [[maybe
         }
     }
 
-    // Update output level meters with peak values
     levelL.updateIfGreater(maxL);
     levelR.updateIfGreater(maxR);
 
 #if JUCE_DEBUG
-    // Protect ears during development from excessive output levels
     protectYourEars(buffer);
 #endif
 }
 
 bool DelayAudioProcessor::hasEditor() const
 {
-    return true; // (change this to false if you choose to not supply an editor)
+    return true;
 }
 
 juce::AudioProcessorEditor* DelayAudioProcessor::createEditor()

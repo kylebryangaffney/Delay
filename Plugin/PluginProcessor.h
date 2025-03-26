@@ -2,11 +2,11 @@
 
 #include <JuceHeader.h>
 #include <juce_dsp/juce_dsp.h>
-#include "DelayLine.h"
-#include "Parameters.h"
-#include "Measurement.h"
 #include "Service/PresetManager.h"
-#include "Tempo.h"
+#include "Service/Parameters.h"
+#include "Service/Measurement.h"
+#include "DSP/Tempo.h"
+#include "DSP/DelayLine.h"
 
 
 
