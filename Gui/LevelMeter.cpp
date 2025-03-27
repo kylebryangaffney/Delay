@@ -9,26 +9,26 @@
 */
 
 #include <JuceHeader.h>
-#include "LevelMeter.h"
-#include "LookAndFeel.h"
+#include "../Gui/LevelMeter.h"
+#include "../Gui/LookAndFeel.h"
 
-
-LevelMeter::LevelMeter(Measurement& measurementL_, Measurement& measurementR_) 
+//==============================================================================
+LevelMeter::LevelMeter(Measurement& measurementL_, Measurement& measurementR_)
     : measurementL(measurementL_), measurementR(measurementR_)
 {
     dbLevelL = clampdB;
     dbLevelR = clampdB;
+
     setOpaque(true);
     startTimerHz(refreshRate);
+
     decay = 1.f - std::exp(-1.f / (float(refreshRate) * 2.f));
-
 }
 
-LevelMeter::~LevelMeter()
-{
-}
+LevelMeter::~LevelMeter() = default;
 
-void LevelMeter::paint (juce::Graphics& g)
+//==============================================================================
+void LevelMeter::paint(juce::Graphics& g)
 {
     const auto bounds = getLocalBounds();
 
@@ -41,6 +41,7 @@ void LevelMeter::paint (juce::Graphics& g)
     for (float db = maxdB; db >= mindB; db -= stepdB)
     {
         int y = positionForLevel(db);
+
         g.setColour(Colors::LevelMeter::tickLine);
         g.fillRect(0, y, 16, 1);
 
@@ -52,27 +53,27 @@ void LevelMeter::paint (juce::Graphics& g)
 void LevelMeter::resized()
 {
     maxPos = 4.f;
-    minPos = float(getHeight() - 4.f);
+    minPos = float(getHeight()) - 4.f;
 }
 
 void LevelMeter::timerCallback()
 {
-    //DBG("left: " << measurementL.load() << ", right: " << measurementR.load());
-
     updateLevel(measurementL.readAndReset(), levelL, dbLevelL);
     updateLevel(measurementR.readAndReset(), levelR, dbLevelR);
-
     repaint();
 }
 
 void LevelMeter::drawLevel(juce::Graphics& g, float level, int x, int width)
 {
     int y = positionForLevel(level);
+
     if (level > 0.f)
     {
         int y0 = positionForLevel(0.f);
+
         g.setColour(Colors::LevelMeter::tooLoud);
         g.fillRect(x, y, width, y0 - y);
+
         g.setColour(Colors::LevelMeter::levelOK);
         g.fillRect(x, y0, width, getHeight() - y0);
     }
@@ -87,7 +88,7 @@ void LevelMeter::updateLevel(float newLevel, float& smoothedLevel, float& leveld
 {
     if (newLevel > smoothedLevel)
     {
-        smoothedLevel = newLevel; // instantaneous attack
+        smoothedLevel = newLevel; // Instantaneous attack
     }
     else
     {

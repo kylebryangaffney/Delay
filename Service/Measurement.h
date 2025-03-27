@@ -12,13 +12,13 @@
 
 #include <atomic>
 
+//==============================================================================
 struct Measurement
 {
     void reset() noexcept
     {
         value.store(0.f);
     }
-
 
     void updateIfGreater(float newValue) noexcept
     {
@@ -30,5 +30,6 @@ struct Measurement
     {
         return value.exchange(0.f);
     }
+
     std::atomic<float> value;
 };

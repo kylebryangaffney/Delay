@@ -10,12 +10,15 @@
 
 #pragma once
 
-
 #include <cmath>
 
+//==============================================================================
+// Equal-power panning curve.
+// panning range: -1.0 (full left) to 1.0 (full right)
 inline void panningEqualPower(float panning, float& left, float& right)
 {
-    float x = 0.7853981633974483f * (panning + 1.f);
-    left = std::cos(x);
-    right = std::sin(x);
+    constexpr float halfPi = 0.5f * juce::MathConstants<float>::pi;
+    float angle = halfPi * (panning + 1.0f); // Map [-1, 1] to [0, pi]
+    left = std::cos(angle);
+    right = std::sin(angle);
 }

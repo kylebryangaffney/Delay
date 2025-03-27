@@ -12,6 +12,8 @@
 
 #include <memory>
 
+//==============================================================================
+// A simple circular delay buffer with fractional sample support
 class DelayLine
 {
 public:
@@ -21,13 +23,10 @@ public:
     void write(float input) noexcept;
     float read(float delayInSamples) const noexcept;
 
-    int getBufferLength() const noexcept
-    {
-        return bufferLength;
-    }
+    int getBufferLength() const noexcept { return bufferLength; }
 
 private:
     std::unique_ptr<float[]> buffer;
     int bufferLength = 0;
-    int writeIndex = 0; // most recent value was written
+    int writeIndex = 0; // index of the most recently written sample
 };

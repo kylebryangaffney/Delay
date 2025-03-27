@@ -14,10 +14,13 @@
 
 namespace Gui
 {
-    class PresetPanel : public juce::Component, juce::Button::Listener, juce::ComboBox::Listener
+    class PresetPanel : public juce::Component,
+        private juce::Button::Listener,
+        private juce::ComboBox::Listener
     {
     public:
-        PresetPanel(Service::PresetManager& pm) : presetManager(pm)
+        PresetPanel(Service::PresetManager& pm)
+            : presetManager(pm)
         {
             configureButton(saveButton, "Save");
             configureButton(deleteButton, "Delete");
@@ -30,10 +33,9 @@ namespace Gui
             presetList.addListener(this);
 
             loadPresetList();
-            
         }
 
-        ~PresetPanel()
+        ~PresetPanel() override
         {
             saveButton.removeListener(this);
             deleteButton.removeListener(this);
@@ -42,6 +44,7 @@ namespace Gui
             presetList.removeListener(this);
         }
 
+        //==============================================================================
         void resized() override
         {
             const auto container = getLocalBounds().reduced(4);
@@ -57,19 +60,16 @@ namespace Gui
         void loadPresetList()
         {
             presetList.clear(juce::dontSendNotification);
+
             const auto allPresets = presetManager.getAllPresets();
             const auto currentPreset = presetManager.getCurrentPreset();
+
             presetList.addItemList(allPresets, 1);
             presetList.setSelectedItemIndex(allPresets.indexOf(currentPreset), false);
         }
 
     private:
-
-        juce::TextButton saveButton, deleteButton, previousPresetButton, nextPresetButton;
-        juce::ComboBox presetList;
-        Service::PresetManager& presetManager;
-        std::unique_ptr<juce::FileChooser> fileChooser;
-        
+        //==============================================================================
         void buttonClicked(juce::Button* button) override
         {
             if (button == &saveButton)
@@ -79,6 +79,7 @@ namespace Gui
                     Service::PresetManager::defaultDirectory,
                     "*." + Service::PresetManager::extension
                 );
+
                 fileChooser->launchAsync(juce::FileBrowserComponent::saveMode, [&](const juce::FileChooser& chooser)
                     {
                         const auto resultFile = chooser.getResult();
@@ -86,26 +87,23 @@ namespace Gui
                         loadPresetList();
                     });
             }
-
-            if (button == &previousPresetButton)
+            else if (button == &previousPresetButton)
             {
                 const int index = presetManager.loadPreviousPreset();
                 presetList.setSelectedItemIndex(index, false);
-
             }
-
-            if (button == &nextPresetButton)
+            else if (button == &nextPresetButton)
             {
                 const int index = presetManager.loadNextPreset();
                 presetList.setSelectedItemIndex(index, false);
             }
-
-            if (button == &deleteButton)
+            else if (button == &deleteButton)
             {
                 presetManager.deletePreset(presetManager.getCurrentPreset());
                 loadPresetList();
             }
         }
+
         void comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged) override
         {
             if (comboBoxThatHasChanged == &presetList)
@@ -114,16 +112,21 @@ namespace Gui
             }
         }
 
-        void configureButton(juce::Button& button, const juce::String& buttontext)
+        void configureButton(juce::Button& button, const juce::String& buttonText)
         {
-            button.setButtonText(buttontext);
+            button.setButtonText(buttonText);
             button.setMouseCursor(juce::MouseCursor::PointingHandCursor);
             addAndMakeVisible(button);
             button.addListener(this);
-
         }
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PresetPanel)
+        //==============================================================================
+        juce::TextButton saveButton, deleteButton, previousPresetButton, nextPresetButton;
+        juce::ComboBox presetList;
 
+        Service::PresetManager& presetManager;
+        std::unique_ptr<juce::FileChooser> fileChooser;
+
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PresetPanel)
     };
 }

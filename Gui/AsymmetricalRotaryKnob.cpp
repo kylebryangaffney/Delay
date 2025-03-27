@@ -8,16 +8,16 @@
   ==============================================================================
 */
 
-#include "AsymmetricalRotaryKnob.h"
+#include "../Gui/AsymmetricalRotaryKnob.h"
 
-
+//==============================================================================
 AsymmetricalRotaryKnob::AsymmetricalRotaryKnob(const juce::String& text,
     juce::AudioProcessorValueTreeState& apvts,
     const juce::ParameterID& parameterID)
     : RotaryKnob(text, apvts, parameterID, false) // `drawFromMiddle` not needed
 {
-    float pi = juce::MathConstants<float>::pi;
+    const float pi = juce::MathConstants<float>::pi;
 
-    // Adjust rotary parameters for asymmetric behavior
+    // Asymmetric sweep: 225° to 450° (a bit less than full circle)
     slider.setRotaryParameters(1.25f * pi, 2.5f * pi, true);
 }

@@ -1,12 +1,16 @@
-#include "PluginProcessor.h"
-#include "PluginEditor.h"
+#include "../Plugin/PluginProcessor.h"
+#include "../Plugin/PluginEditor.h"
 
 //==============================================================================
-DelayAudioProcessorEditor::DelayAudioProcessorEditor (DelayAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), meter(p.levelL, p.levelR), presetPanel(p.getPresetManager())
+DelayAudioProcessorEditor::DelayAudioProcessorEditor(DelayAudioProcessor& p)
+    : AudioProcessorEditor(&p),
+    audioProcessor(p),
+    meter(p.levelL, p.levelR),
+    presetPanel(p.getPresetManager())
 {
     setLookAndFeel(&mainLF);
 
+    // Delay group
     delayGroup.setText("Delay");
     delayGroup.setTextLabelPosition(juce::Justification::horizontallyCentred);
     delayGroup.addAndMakeVisible(delayTimeKnob);
@@ -15,12 +19,13 @@ DelayAudioProcessorEditor::DelayAudioProcessorEditor (DelayAudioProcessor& p)
     tempoSyncButton.setButtonText("Sync");
     tempoSyncButton.setClickingTogglesState(true);
     tempoSyncButton.setBounds(0, 0, 70, 27);
-    tempoSyncButton.setColour(juce::TextButton::ColourIds::buttonOnColourId, juce::Colours::red);
+    tempoSyncButton.setColour(juce::TextButton::buttonOnColourId, juce::Colours::red);
     tempoSyncButton.setLookAndFeel(ButtonLookAndFeel::get());
     delayGroup.addAndMakeVisible(tempoSyncButton);
 
     addAndMakeVisible(delayGroup);
 
+    // Feedback group
     feedbackGroup.setText("Feedback");
     feedbackGroup.setTextLabelPosition(juce::Justification::horizontallyCentred);
     feedbackGroup.addAndMakeVisible(feedbackKnob);
@@ -31,6 +36,7 @@ DelayAudioProcessorEditor::DelayAudioProcessorEditor (DelayAudioProcessor& p)
     feedbackGroup.addAndMakeVisible(driveKnob);
     addAndMakeVisible(feedbackGroup);
 
+    // Output group
     outputGroup.setText("Output");
     outputGroup.setTextLabelPosition(juce::Justification::horizontallyCentred);
     outputGroup.addAndMakeVisible(gainKnob);
@@ -38,6 +44,7 @@ DelayAudioProcessorEditor::DelayAudioProcessorEditor (DelayAudioProcessor& p)
     outputGroup.addAndMakeVisible(meter);
     addAndMakeVisible(outputGroup);
 
+    // Bypass button
     auto bypassIcon = juce::ImageCache::getFromMemory(BinaryData::Bypass_png, BinaryData::Bypass_pngSize);
     bypassButton.setClickingTogglesState(true);
     bypassButton.setBounds(0, 0, 20, 20);
@@ -48,11 +55,11 @@ DelayAudioProcessorEditor::DelayAudioProcessorEditor (DelayAudioProcessor& p)
         0.f);
     addAndMakeVisible(bypassButton);
 
+    // Presets + finishing touches
     addAndMakeVisible(presetPanel);
-
     gainKnob.slider.setColour(juce::Slider::rotarySliderFillColourId, Colors::Slider::standoutFill);
 
-    setSize (500, 490);
+    setSize(500, 490);
 
     updateDelayKnobs(audioProcessor.params.tempoSyncParam->get());
     audioProcessor.params.tempoSyncParam->addListener(this);
@@ -73,21 +80,17 @@ void DelayAudioProcessorEditor::paint(juce::Graphics& g)
     g.setColour(Colors::header);
     g.fillRect(rect);
 
-    auto image = juce::ImageCache::getFromMemory
-    (
-        BinaryData::Logo_png, BinaryData::Logo_pngSize
-    );
-
+    auto image = juce::ImageCache::getFromMemory(BinaryData::Logo_png, BinaryData::Logo_pngSize);
     int destWidth = image.getWidth() / 2;
     int destHeight = image.getHeight() / 2;
-    g.drawImage(image, getWidth() / 2 - destWidth / 2, 0,
-        destWidth, destHeight, 0, 0, image.getWidth(), image.getHeight());
+
+    g.drawImage(image,
+        getWidth() / 2 - destWidth / 2, 0,
+        destWidth, destHeight,
+        0, 0, image.getWidth(), image.getHeight());
 }
 
-
-
 void DelayAudioProcessorEditor::resized()
-
 {
     auto bounds = getLocalBounds();
 
@@ -134,7 +137,6 @@ void DelayAudioProcessorEditor::parameterValueChanged(int, float value)
                 updateDelayKnobs(value != 0.f);
             });
     }
-    //DBG("Parameter changed: " << value);
 }
 
 void DelayAudioProcessorEditor::updateDelayKnobs(bool tempoSyncActive)
